@@ -1,0 +1,343 @@
+<html>
+ <head>
+  <link type="text/css" href="/media/jquery-ui/css/ui-lightness/jquery-ui-1.8.11.custom.css" rel="stylesheet">
+
+  <!-- jQuery and our plugins -->
+  <script type="text/javascript" src="/media/jquery-1.5.2/jquery-1.5.2.min.js"></script>
+  <script type="text/javascript" src="/media/jquery-1.5.2/jquery.cookie.js"></script>
+  <script type="text/javascript" src="/media/jquery-1.5.2/jquery.hotkeys.js"></script>
+  <script type="text/javascript" src="/media/jquery-1.3.2/jquery.json-2.2.js"></script>
+
+  <script type="text/javascript" src="/media/jsTree/jquery.jstree.js"></script>
+  <script type="text/javascript" src="/media/jquery-ui/js/jquery-ui-1.8.11.custom.min.js"></script>
+
+  <!-- our library stuff -->
+  <script type="text/javascript" src="/media/smap/js/print_r.js"></script>
+  <script type="text/javascript" src="/media/smap/js/lib.js"></script>
+  <style type="text/css">
+    .demo, .demo input, .jstree-dnd-helper, #vakata-contextmenu { font-size:10px; font-family:Verdana; }
+    label { clear: left }
+    .half { width: 50%; float:left }
+    .top { height: 70px; padding: 12pt}
+    input { padding-left: 12pt}
+    #unit { padding-top: 12pt }
+    #new_tree, #plot_tree { height: 75%; overflow: auto }
+  </style>
+ </head>
+ <body>
+  <div id="dialog_aggregate">
+   <input type="radio" name="agg_type" value="sum" id="agg_sum"><label for="agg_sum">sum</label><br>
+   <input type="radio" name="agg_type" value="mean" id="agg_mean"><label for="agg_mean">mean</label><p>
+   <input type="button" id="agg_add" value="Create">
+   <input type="button" id="agg_cancel" value="Cancel">
+  </div>
+
+  <div class="demo">
+   <div class="half">
+     <div class="top">
+      <input type="button" id="reset" value="Reset">&nbsp;
+      <input type="button" id="open_all" value="Open All">&nbsp;
+      <input type="button" id="close_all" value="Close All">&nbsp;
+      <div id="unit"></div>
+     </div>
+     <hr>
+     <div id="new_tree"></div>
+   </div>
+   <div class="half">
+     <div class="top">
+      <div>
+      <input type="button" id="plot_new" value="New">
+      <input type="button" id="plot_save" value="Save">
+      <select id="plot_select" >
+      </select>
+      </div>
+      <div style="margin-top: 12pt;">
+       <input type="button" id="plot_delete" value="Delete">
+       <input type="button" id="plot_rename" value="Rename">
+       <input type="button" id="plot_undo" value="Undo Add">
+       <input type="button" id="plot_agg" value="Create Aggregate">
+      </div>
+     </div>
+     <div>
+     </div>
+     <hr>
+     <div id="plot_tree"></div>
+   </div>
+  </div>
+  <script type="text/javascript">
+var type_data = {
+      "aggregate" : {
+        "valid_children" : ["stream", "aggregate"],
+      },
+      "container" : {
+        "valid_children" : "all",
+      },
+      "subscription" : {
+        "valid_children" : [ "point" ],
+      },
+      "stream" : {
+        "valid_children" : "none",
+      },
+      "point" : {
+        "valid_children" : [ "stream" ]
+      }
+    };
+var tree_id = 5;
+var last_add = [];
+
+$(function() {
+  $.ajax({
+     async: true,
+     type: "GET", 
+     url: "/smap/plottree/",
+     success: function (r) {
+       for (var i = 0; i < r.length; i++) {
+          document.getElementById("plot_select").options.add(new Option(r[i][1], r[i][0]));
+       }
+     }
+   });
+  $("#plot_select").change(function () {
+    tree_id = $("#plot_select").val();
+    settings = $("#plot_tree").jstree("get_settings");
+    settings.json_data.ajax.url = "/smap/plottree/" + tree_id;
+    $.jstree._reference("#plot_tree")._set_settings(settings);
+    $.jstree._reference("#plot_tree").load_node_json(-1,false,false);
+   });
+});
+
+$(function() {
+  $("#reset").button();
+  $("#reset").click(function () {
+     $("#new_tree li").show();
+     $("#new_tree li").attr("unit_set", false);
+  });
+
+  $("#open_all").button();
+  $("#open_all").click(function () {
+     $("#new_tree:visible").jstree("open_all");
+  });
+
+  $("#close_all").button();
+  $("#close_all").click(function () {
+     $("#new_tree").jstree("close_all");
+  });
+
+  $("#plot_delete").button();
+  $("#plot_delete").click(function () {
+     selected = $("#plot_tree").jstree("get_selected");
+     if (selected.attr("id") != "mainplot") {
+       $("#plot_tree").jstree("remove", selected);
+     } else { 
+       $("#mainplot").children("ul").children("li").each(function (i, n) {
+         $("#plot_tree").jstree("remove", n);
+       });
+     }
+  });
+
+  $("#plot_rename").button();
+  $("#plot_rename").click(function () {
+    $("#plot_tree").jstree("rename");
+  });
+
+  $("#plot_undo").button();
+  $("#plot_undo").click(function () {
+     for (var i = 0; i < last_add.length; i++) {
+       $(last_add[i]).remove();
+     };
+     last_add = [];
+  });
+
+  $("#plot_agg").button();
+  $("#plot_agg").click(function () {
+     $("#dialog_aggregate").dialog("open");
+  });
+
+  $("#plot_new").button();
+  $("#plot_new").click(function () {
+    tree_id = "";
+    $("#mainplot").children("ul").children("li").each(function (i, n) {
+      $("#plot_tree").jstree("remove", n);
+    });
+    $("#plot_tree").jstree("set_text", "#mainplot"
+, "New Plot");
+  });
+
+  $("#plot_save").button();
+  $("#plot_save").click(function () {
+    var json_tree =$.toJSON(tree_to_json($("#mainplot")));
+    $.ajax({
+       async: false,
+       type: "POST", 
+       url: "/smap/plottree/" + tree_id,
+       data: json_tree,
+       success: function (r) {
+         tree_id = r["tree"];
+         alert(print_r(r, true));
+       }
+     });
+  });
+
+  var agg_idx = 0;
+  $("#dialog_aggregate").dialog({title: "Create Aggregate", autoOpen: false});
+  $("#agg_add").button();
+  $("#agg_add").click(function () {
+     var atype = $('input[name="agg_type"]:checked').val();
+     if (atype != undefined) {
+       $("#plot_tree").jstree("create", null, null, 
+         {data: atype + "_" + agg_idx++, attr: {rel: "aggregate", fn: atype}}, null, true);
+       $("#dialog_aggregate").dialog("close");
+     }
+  });
+  $("#agg_cancel").button();
+  $("#agg_cancel").click(function () {
+     $("#dialog_aggregate").dialog("close");
+  });
+});
+
+function tree_to_json(root) {
+  return {
+    data: $("#plot_tree").jstree("get_text", root),
+    attr: { rel: $(root).attr("rel"), 
+            refid: $(root).attr("refid"),
+            id: $(root).attr("id"),
+            fn: $(root).attr("fn")},
+    children: $.map($(root).children("ul").children("li"), tree_to_json),
+  }
+}
+
+$(function() {
+ $("#plot_tree")
+   .jstree({
+   "plugins" : ["themes", "crrm", "ui", "dnd", "types", "json_data"],
+//   "json_data" :  {
+//                         /"data" : { "data" : "Plot", "attr" : {"rel" : "container", "id" : "mainplot" } },
+//   },
+  "json_data" : {
+     "ajax" : {
+       "url" : "/smap/plottree/" + tree_id, // "/smap/tree/2",
+       }
+  },
+
+   "crrm" : { "move" : { 
+     "always_copy" : "multitree",
+     } 
+    },
+  "ui" : {
+    "select_multiple_modifier" : "alt",
+    },
+  "types" : {
+    "types" : type_data,
+    }
+  })
+  .bind("before.jstree", function (e, data) {
+    if (data.func == "move_node") {
+     try {
+      if (data.args.length >= 2 &&
+          data.args[0].parents("#new_tree").length > 0 && 
+          data.args[1].parents("#plot_tree").length > 0) {
+        // in a cross-tree copy, don't copy the _actual_ node
+        var streams;
+        if (data.args[0].attr("rel") == "stream") {
+          streams = new Array(data.args[0]);
+        } else {
+          streams = data.args[0].find('li[rel="stream"][unit_set=true]')
+        }
+        if (streams.length > 0) {
+          last_add = [];
+        }
+        if ($(data.args[1]).children("ul").length > 0) {
+          var add_obj = $(data.args[1]).children("ul")[0];
+        } else {
+          var add_obj = $("<ul>");
+          $(data.args[1]).append(add_obj);
+        }
+
+        for (var i = 0; i < streams.length; i++) {
+           var o = streams[i];
+           var path = $("#new_tree").jstree("get_path", o);
+           o = $(o).clone(o);
+           $("#new_tree").jstree("set_text", o, path.join("/"));
+                            //data.args[1].jstree(append(o);
+           $(add_obj).append(o);
+           // data.args[1].jstree("paste", o);
+
+           //$("#new_tree").jstree("move_node", data.args[1], o, "last", false, false, true);
+           last_add.push(o);
+        }
+        e.stopImmediatePropagation(); 
+        return false;
+      }
+     } catch (err) {}
+    }
+  })
+});
+
+
+$(function() {
+ $("#new_tree")
+ .jstree({
+  "plugins" : [ "json_data", "themes", "crrm", "ui", "dnd", "types" ],
+  "crrm" : { "move" : { 
+    "always_copy" : "multitree",
+    "open_onmove" : false,
+     "check_move" : function (m) { 
+       // only allow moves to other trees from the source tree
+       return (m.rt == $("#plot_tree"));
+      }
+     }
+    },
+  "json_data" : {
+// "progressive_render" : true,
+     "ajax" : {
+       "url" : "/smap/tree/2", // "/media/tree.json", //
+       }
+  },
+  "types" : {
+    "types" : type_data,
+    },
+   "core" : {
+     "animation" : 100,
+   }
+  })
+ .bind("select_node.jstree", function (e, data) {
+  var sel = $("#new_tree").jstree("get_selected");
+  var children = sel.find("li");
+  var units = [];
+  for (var i = 0; i < children.length; i++) {
+    var obj = children[i];
+    var unit = $(obj).attr("unit");
+    if (unit && unit != "Unknown") {
+      units[unit] = true;
+    }
+  }
+
+  // create a button set containing the units we could plot.
+  units = keys(units);
+  $("#unit").empty();
+  for (var u in units) {
+    u = units[u];
+    $("#unit").append("<input type=\"radio\" value=\"" + u + "\" id=\"unit_" 
+          + u + "\" name=\"unit\"><label for=\"unit_" + u + "\">" + u);
+  }
+  $("#unit").buttonset();
+  $('input[name="unit"]').change(function () {
+    var sel = $("#new_tree").jstree("get_selected").attr("id");
+    var unit = $('input[name="unit"]:checked').val();
+
+    // hide all the li elements in the tree
+    $("#new_tree li").hide();
+    $("#new_tree li").attr("unit_set", false);
+    // show all the leaf nodes with the right units
+    var shownodes = $('#' + sel + ' li[unit=' + unit + '][rel="stream"]');
+    shownodes.show();
+    shownodes.attr("unit_set", true);
+
+    // then show their parents
+    shownodes.parents("#new_tree li").show();
+
+  });
+ });
+});
+  </script>
+ </body>
+</html>

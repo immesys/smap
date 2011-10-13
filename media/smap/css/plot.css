@@ -1,0 +1,172 @@
+body {
+        font-family: "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+}
+
+.ui-widget { font-size: 10px; }
+
+#queryurl {
+ width: 70%;
+ border: 0;
+ font-size: 80%;
+}
+
+#console {
+ width: 20%;
+ text-align:right;
+}
+
+a:visited {
+ color: blue;
+}
+
+a {
+ color: blue;
+}
+
+#load_time {
+ float: right;
+}
+
+#nav {
+//  overflow: auto;
+}
+
+.main {
+  margin-left: auto;
+  margin-right: auto;
+  width: 1000px;
+}
+
+.bottom {
+  font-size: 70%;
+  clear: left;
+//  border: 3px solid black;
+}
+.head {
+ width: 100%;
+// position: absolute;
+// clear: left;
+}
+
+#leftrotate {
+ height: 400px;
+ width: 50px;
+ float:left;
+}
+
+#viewselect {
+ width: 100%;
+}
+
+.series_color {
+ width: 20px;
+ height: 20px;
+ float: left;
+ vertical-align: center;
+}
+.legend_item {
+ width: 100%;
+}
+
+.series_label {
+  float: left;
+  margin-left: 20px;
+  padding-bottom: 10px;
+
+}
+
+.tag_table {
+ clear: left;
+ font-size: small;
+}
+
+td {
+ padding-left: 14pt;
+}
+
+#yaxisLabel { 
+  font-size: 12pt;
+  color: #6a6a6a;
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  -webkit-transform-origin: left top;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform-origin: left top;
+  -moz-transform: rotate(-90deg);
+  -o-transform-origin: left top;
+  -o-transform: rotate(-90deg);
+  transform-origin: left top;
+  transform: rotate(-90deg);
+}
+
+#yaxis2Label {
+  font-size: 12pt;
+  color: #6a6a6a;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 50%;
+  -webkit-transform-origin: left top;
+  -webkit-transform: rotate(-90deg);
+  -moz-transform-origin: left top;
+  -moz-transform: rotate(-90deg);
+  -o-transform-origin: left top;
+  -o-transform: rotate(-90deg);
+  transform-origin: left top;
+  transform: rotate(-90deg);
+}
+
+#xaxisLabel {
+  font-size: 12pt;
+  color: #6a6a6a;
+  width: 100%;
+  text-align: center;
+  clear: left;
+  height: 30px%;
+}
+
+.chart_wrapper {
+  clear: left; 
+  float: left;
+  position:relative;
+  padding: 5px;
+  -moz-box-sizing:border-box;
+  box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+}
+
+#description {
+  float: left;
+  width: 90%;
+  padding-left: 20px;
+  height: auto;
+}
+
+h2 {
+  padding: 0px;
+  font-size: 16pt;
+}
+.username {
+  font-size: 10pt;
+  margin-right: auto;
+  float: left;
+}
+#pagetitle {
+  float: right;
+  padding: 0px;
+  margin: 0px;
+}
+
+#chart_div .zoomout {
+ position: absolute; 
+ right:20px; 
+ top:20px;"
+}
+
+#chart_div div.zoomout {
+  font-size: smaller;
+  color: #999;
+  background-color: #eee;
+  padding: 2px;
+}

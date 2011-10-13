@@ -1,0 +1,50 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module newlib.smaplog</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="newlib.html"><font color="#ffffff">newlib</font></a>.smaplog</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/sdawson/svn/code/smap/newlib/smaplog.py">/home/sdawson/svn/code/smap/newlib/smaplog.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="logging.html">logging</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-start_log"><strong>start_log</strong></a>(emails<font color="#909090">=[]</font>, fileLevel<font color="#909090">=20</font>)</dt><dd><tt>Utility&nbsp;function&nbsp;for&nbsp;initializing&nbsp;the&nbsp;logging&nbsp;module&nbsp;in&nbsp;a<br>
+useful&nbsp;way.&nbsp;&nbsp;The&nbsp;default&nbsp;is&nbsp;to&nbsp;set&nbsp;the&nbsp;console&nbsp;loglevel&nbsp;to&nbsp;DEBUG<br>
+and&nbsp;the&nbsp;file&nbsp;level&nbsp;to&nbsp;INFO.&nbsp;&nbsp;WARN&nbsp;and&nbsp;above&nbsp;will&nbsp;be&nbsp;sent&nbsp;to&nbsp;the<br>
+email&nbsp;list&nbsp;passed&nbsp;in.<br>
+&nbsp;<br>
+File&nbsp;logs&nbsp;are&nbsp;kept&nbsp;in&nbsp;either,&nbsp;/var/log&nbsp;or&nbsp;the&nbsp;current&nbsp;directory,<br>
+in&nbsp;that&nbsp;order.&nbsp;&nbsp;Apache-style&nbsp;HTTP&nbsp;logs&nbsp;are&nbsp;separated&nbsp;from&nbsp;other<br>
+console&nbsp;messages,&nbsp;and&nbsp;both&nbsp;types&nbsp;use&nbsp;the&nbsp;RotatingFileHandler&nbsp;so<br>
+that&nbsp;the&nbsp;disk&nbsp;doesn't&nbsp;fill&nbsp;up.<br>
+&nbsp;<br>
+It&nbsp;is&nbsp;recommended&nbsp;that&nbsp;you&nbsp;call&nbsp;this&nbsp;function&nbsp;before&nbsp;proceeding<br>
+with&nbsp;using&nbsp;the&nbsp;sMAP&nbsp;library&nbsp;in&nbsp;order&nbsp;to&nbsp;capture&nbsp;any&nbsp;errors.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>project_log</strong> = '/project/eecs/tinyos/corytestbed/local/var/log'</td></tr></table>
+</body></html>

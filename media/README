@@ -1,0 +1,13 @@
+
+ Things in this directory should be "packages".  This application is
+ currently called smap so you can put your shit in there and reference
+ the library components.
+
+ For stuff like jquery, include a version number in the path so we can
+ host multiple versions -- sometimes this is important so we don't
+ accidently break something.
+
+ package
+  js
+  html
+  css

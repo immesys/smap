@@ -1,0 +1,65 @@
+<html>
+ <head>
+  <link href="http://www.cs.berkeley.edu/~stevedh/newstyle.css" type="text/css" rel="stylesheet">
+  <title>sMAP Backend v2</title>
+ </head>
+ <body>
+  <script type="text/javascript"></script>
+  <form method="GET" id="sub_form"></form>
+  <h2>&laquo;  sMAP Source Detail</h2>  
+  <p>
+   <a href="{{conf.PATH}}/smap/status">View all</a>&nbsp|&nbsp;
+   <a href="{{conf.PATH}}/admin/smap/subscription/{{subscription.id}}">Edit</a>
+{% if subscription.default_stream_id %}
+  &nbsp|&nbsp;
+   <a href="{{conf.PATH}}/smap/plot/{{subscription.default_stream_id}}">Plot</a>
+{% endif %}
+{% if subscription.acme %}
+  &nbsp|&nbsp;
+  <a href="{{conf.PATH}}/m/status/{{subscription.id}}">Acme status</a>
+{% endif %}
+
+  </p>
+
+  <table border=1>
+  <tr><td>Display Name</td><td>{{subscription.name}}</td></tr>
+  <tr><td>sMAP URL</td>
+   <td><a href="http://smap.cs.berkeley.edu/?smap_loc={{subscription.url}}">{{subscription.url}}</a></td>
+  </tr>
+  {% if subscription.subdomain %}
+  <tr><td>DNS Location</td><td>{{subscription.subdomain}}.{{zone}}</td></tr>
+  {% endif %}
+  <tR><td>Description</td><td>{{subscription.description|linebreaks}}</td></tr>
+  </table>
+
+  <h3>&laquo;  Streams Originating from Source</h3>
+  <table border=1 cellpadding=3>
+   <tr>
+    <th>stream identifier</th>
+    <th>name</th>
+    <th>sMAP resource</th>
+    <th>Unit</th>
+    <th>commands</th>
+   </tr>
+   {% for s in streams.itervalues %}
+   <tr>
+    <td>{{s.id}}@{{netloc}}</td>
+    <td>{{s.name}}</td>
+    <td>{{s.path}}</td>
+    <td>{{s.formatting.unit_of_measure}}</td>
+    <td><a href="{{conf.PATH}}/smap/plot/{{s.id}}">[plot]</a>
+    <a href="{{conf.PATH}}/admin/smap/stream/{{s.id}}">[edit]</a>
+{% ifnotequal s.id subscription.default_stream.id %}
+    <a href="{{conf.PATH}}/smap/command/default/{{subscription.id}}/{{s.id}}">[default]</a>
+{% endifnotequal %}
+    </td>
+    {% endfor %}
+  </table>
+  <ul>
+   <li><b>plot:</b> link to that stream's plot
+   <li><b>edit:</b> edit stream's metadata
+   <li><b>default:</b> make this the default stream to plot when this source
+  is selected
+  </ul>
+ </body>
+</html>

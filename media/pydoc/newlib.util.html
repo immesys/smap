@@ -1,0 +1,120 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module newlib.util</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="newlib.html"><font color="#ffffff">newlib</font></a>.util</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/sdawson/svn/code/smap/newlib/util.py">/home/sdawson/svn/code/smap/newlib/util.py</a></font></td></tr></table>
+    <p><tt>Fun&nbsp;stuff&nbsp;to&nbsp;ease&nbsp;the&nbsp;pain.<br>
+&nbsp;<br>
+class&nbsp;<a href="#RateTimer">RateTimer</a>:&nbsp;call&nbsp;a&nbsp;function&nbsp;at&nbsp;a&nbsp;constant&nbsp;rate,&nbsp;every&nbsp;N&nbsp;seconds.<br>
+&nbsp;The&nbsp;function&nbsp;calls&nbsp;run&nbsp;synchronously&nbsp;and&nbsp;will&nbsp;not&nbsp;overlap&nbsp;if&nbsp;the&nbsp;rate<br>
+&nbsp;is&nbsp;too&nbsp;fast.<br>
+&nbsp;<br>
+http_load:&nbsp;read&nbsp;a&nbsp;json&nbsp;object&nbsp;at&nbsp;a&nbsp;url&nbsp;with&nbsp;simplified&nbsp;error&nbsp;handling:<br>
+&nbsp;return&nbsp;None&nbsp;on&nbsp;any&nbsp;error.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="simplejson.html">simplejson</a><br>
+<a href="logging.html">logging</a><br>
+</td><td width="25%" valign=top><a href="random.html">random</a><br>
+<a href="threading.html">threading</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+<a href="urllib2.html">urllib2</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="threading.html#Thread">threading.Thread</a>(<a href="threading.html#_Verbose">threading._Verbose</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="newlib.util.html#RateTimer">RateTimer</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="RateTimer">class <strong>RateTimer</strong></a>(<a href="threading.html#Thread">threading.Thread</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Implements&nbsp;a&nbsp;constant-rate&nbsp;timer:&nbsp;calls&nbsp;fn&nbsp;every&nbsp;period&nbsp;seconds<br>
+without&nbsp;overlap&nbsp;if&nbsp;the&nbsp;executions&nbsp;are&nbsp;slow.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="newlib.util.html#RateTimer">RateTimer</a></dd>
+<dd><a href="threading.html#Thread">threading.Thread</a></dd>
+<dd><a href="threading.html#_Verbose">threading._Verbose</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="RateTimer-__init__"><strong>__init__</strong></a>(self, period, fn)</dt></dl>
+
+<dl><dt><a name="RateTimer-run"><strong>run</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="threading.html#Thread">threading.Thread</a>:<br>
+<dl><dt><a name="RateTimer-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RateTimer-getName"><strong>getName</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RateTimer-isAlive"><strong>isAlive</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RateTimer-isDaemon"><strong>isDaemon</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="RateTimer-is_alive"><strong>is_alive</strong></a> = isAlive(self)</dt></dl>
+
+<dl><dt><a name="RateTimer-join"><strong>join</strong></a>(self, timeout<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="RateTimer-setDaemon"><strong>setDaemon</strong></a>(self, daemonic)</dt></dl>
+
+<dl><dt><a name="RateTimer-setName"><strong>setName</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="RateTimer-start"><strong>start</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="threading.html#Thread">threading.Thread</a>:<br>
+<dl><dt><strong>daemon</strong></dt>
+</dl>
+<dl><dt><strong>ident</strong></dt>
+</dl>
+<dl><dt><strong>name</strong></dt>
+</dl>
+<hr>
+Data descriptors inherited from <a href="threading.html#_Verbose">threading._Verbose</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-http_load"><strong>http_load</strong></a>(url, data<font color="#909090">=None</font>, timeout<font color="#909090">=5</font>)</dt><dd><tt>Simplified&nbsp;way&nbsp;to&nbsp;load&nbsp;an&nbsp;HTTP&nbsp;resource&nbsp;which&nbsp;yields&nbsp;a&nbsp;json&nbsp;object,<br>
+and&nbsp;return&nbsp;the&nbsp;decoded&nbsp;object.&nbsp;&nbsp;Returns&nbsp;None&nbsp;if&nbsp;there&nbsp;is&nbsp;any<br>
+error.<br>
+&nbsp;<br>
+@data&nbsp;optional&nbsp;data&nbsp;to&nbsp;pass&nbsp;as&nbsp;a&nbsp;body&nbsp;in&nbsp;a&nbsp;POST&nbsp;request<br>
+@url&nbsp;a&nbsp;string&nbsp;containing&nbsp;a&nbsp;url</tt></dd></dl>
+</td></tr></table>
+</body></html>

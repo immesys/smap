@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9"> 
+    <!--[if IE]><script src="excanvas.js"></script><![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <script language="javascript" type="text/javascript" src="/media/jquery-1.5.2/jquery-1.5.2.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/media/jquery-1.5.2/jquery.json-2.2.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/media/flot-0.7/js/jquery.flot.min.js"></script>
+
+    <script type="text/javascript" src="/media/jsTree/jquery.jstree.js"></script>
+
+    <title>Graph</title>
+  <style type="text/css">
+    .tree { 
+      position: relative;
+      float: left;
+      height: 100%;
+      width: 500px;
+      padding-right: 10px;
+      scroll: hidden;
+    }
+    #graph_legend {
+      position: relative;
+      float: right;
+      width: 400px;
+    }
+    #graph {
+      position: relative;
+      float: right;
+      width: 400px;
+      height: 300px;
+    }
+    #plot_tree {
+      padding-top: 10px;
+    } 
+  </style>
+  <script>
+  var treeData = [];
+  var id = 0;
+  $(function() {
+    $.ajax({
+       async: false,
+       type: "GET", 
+       url: "/smap/plottree/",
+       success: function (r) {
+         for (var i = 0; i < r.length; i++) {
+            $('#plot_select').append(new Option(r[i][1], r[i][0]));
+         }
+       }
+     });
+
+    $("#plot_tree").jstree({
+      "json_data" : {
+        "ajax" : { 
+          "url" : function() { return "/smap/plottree/" + $("#plot_select").val(); },
+          "success" : function(data) {
+            id = 0;
+            treeData = updateTreeData(data, 0);
+            return treeData;
+          } 
+        }
+      },
+      "themes" : {
+        "url" : "/media/jsTree/themes/default/style.css",
+        "dots" : true,
+        "icons" : true
+      },
+      "plugins" : ["themes", "json_data"]
+    });
+
+    $("#plot_tree")
+    .bind("loaded.jstree", treeLoad)
+    .bind("refresh.jstree", treeLoad); 
+
+    $("#plot_select").change(function () {
+      // Reload tree with new URL
+      $("#plot_tree").jstree("refresh", -1);
+    });
+
+  }); //End onload
+ 
+  // Set ids and depth attributes on tree nodes, truncate names
+  var maxLen = 50;
+  function updateTreeData(data, depth) { 
+    data['attr']['id'] = id++;
+    data['attr']['depth'] = depth;
+    if (depth == 0)
+      data['state'] = "open";
+
+    if (data['data'].length > maxLen) {
+      data['data'] = data['data'].substring(data['data'].indexOf('/')+1);
+      if (data['data'].length > maxLen)
+        data['data'] = data['data'].substring(0,maxLen-3) + "...";
+    }
+
+    for (c in data['children']) {
+      updateTreeData(data['children'][c], depth + 1);
+    }
+    return data;
+  }
+
+  function treeLoad(event, data) {
+    //data.inst.open_node($("li[depth=0]"));
+    //data.inst.open_all(-1);
+    plot($("#plot_select").val());
+  }
+
+  function getNodeNames() {
+    var list = [];
+    for (var i in treeData['children']) {
+      list.push(treeData['children'][i]['data']);
+    }
+    return list;
+  }
+  
+  function plot(tree_id) {
+    var end = Math.floor(new Date().getTime()/1000);
+    var start = end - 24*60*60;
+    var data = [];
+    $.ajax({
+      url: "/smap/plottree/" + tree_id + "/data.json?starttime="+escape(start)+"&endtime="+escape(end) + "&substream=0",
+      async: false,
+      dataType: "json",
+      error: function(jqXHR, textStatus, errorThrown) {
+        //debug(textStatus);
+      },
+      success: function (d) { data = d; }
+    });
+    if (data.length < 1) return;
+
+    var num_streams = data[0].length - 1;
+    var streams = [];
+    for (var i = 0; i < num_streams; i++) streams[i] = [];
+
+    var diff = new Date().getTimezoneOffset() * 60*1000;
+    for (i in data) {
+      var time = data[i][0]*1000 - diff;
+      for (var j = 1; j < data[i].length; j++) {
+        streams[j-1].push([time, data[i][j]]);
+      }
+    }
+  
+    var names = getNodeNames();  
+    var plot_data = [];
+    for (var i = 0; i < num_streams; i++) {
+      plot_data[i] = {
+        label: names[i],
+        data: streams[i]
+      };
+    }
+    var option = {
+      series: {
+        lines: { show: true, fill: false, lineWidth: 1},
+        points: { show: false },
+        shadowSize: 0
+      },
+      legend: { show: true, container: $("#graph_legend") },
+      xaxis: {
+        //min: start,
+        //max: end,
+        //timeformat: "%m/%d/%y",
+        mode: "time"
+      },
+      yaxis: {
+      }
+    };
+
+    var p = $.plot($("#graph"), plot_data, option);
+  }
+  </script>
+  </head>
+  <body>
+   <div class="tree">
+    <select id="plot_select"></select>
+    <div id="plot_tree"></div>
+   </div>
+   <div id="graph_legend"></div>
+   <div id="graph"></div>
+  </body>
+</html>

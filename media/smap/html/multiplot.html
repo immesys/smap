@@ -1,0 +1,53 @@
+<html>
+ <head>
+  <link type="text/css" href="/media/smap/js/jquery-ui/css/ui-lightness/jquery-ui-1.8.11.custom.css" rel="stylesheet">
+  <script type="text/javascript" src="_lib/jquery.js"></script>
+  <script type="text/javascript" src="_lib/jquery.cookie.js"></script>
+  <script type="text/javascript" src="_lib/jquery.hotkeys.js"></script>
+  <script type="text/javascript" src="/media/smap/js/jquery-ui/js/jquery-ui-1.8.11.custom.min.js"></script>
+  <script type="text/javascript" src="jquery.jstree.js"></script>
+  <script type="text/javascript" src="jquery.json-2.2.js"></script>
+  <script type="text/javascript" src="print_r.js"></script>
+  <script type="text/javascript" src="/media/smap/js/lib.js"></script>
+  <script type="text/javascript" src="/media/smap/js/dygraph-combined.js"></script>
+  <style type="text/css">
+    .demo, .demo input, .jstree-dnd-helper, #vakata-contextmenu { font-size:10px; font-family:Verdana; }
+    label { clear: left }
+    .half { width: 50%; float:left }
+    .top { height: 70px; padding: 12pt}
+    input { padding-left: 12pt}
+    #unit { padding-top: 12pt }
+    #new_tree, #plot_tree { height: 75%; overflow: auto }
+  </style>
+ </head>
+ <body>
+
+  <div class="demo">
+   <select id="plot_select" >
+   </select>
+   <div id="plot_div"></div>
+  </div>
+  <script type="text/javascript">
+
+$(function() {
+  $.ajax({
+     async: true,
+     type: "GET", 
+     url: "/smap/plottree/",
+     success: function (r) {
+       for (var i = 0; i < r.length; i++) {
+          document.getElementById("plot_select").options.add(new Option(r[i][1], r[i][0]));
+       }
+     }
+   });
+  $("#plot_select").change(function () {
+   });
+});
+
+  g = new Dygraph(document.getElementById("plot_div"),
+                  "/smap/plottree/5/data.csv?starttime=1302570293&endtime=1302572293");
+
+
+  </script>
+ </body>
+</html>

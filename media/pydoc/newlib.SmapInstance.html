@@ -1,0 +1,197 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module newlib.SmapInstance</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="newlib.html"><font color="#ffffff">newlib</font></a>.SmapInstance</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/sdawson/svn/code/smap/newlib/SmapInstance.py">/home/sdawson/svn/code/smap/newlib/SmapInstance.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="newlib.Reporting.html">newlib.Reporting</a><br>
+<a href="newlib.SmapContext.html">newlib.SmapContext</a><br>
+</td><td width="25%" valign=top><a href="newlib.SmapHttp.html">newlib.SmapHttp</a><br>
+<a href="newlib.SmapStatus.html">newlib.SmapStatus</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#dict">__builtin__.dict</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="newlib.SmapInstance.html#SmapInstance">SmapInstance</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SmapInstance">class <strong>SmapInstance</strong></a>(<a href="__builtin__.html#dict">__builtin__.dict</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;implementing&nbsp;a&nbsp;single&nbsp;smap&nbsp;"instance";&nbsp;corresponding&nbsp;to&nbsp;a<br>
+root&nbsp;with&nbsp;data/,&nbsp;reporting/,&nbsp;status/,&nbsp;and&nbsp;context/<br>
+resources.&nbsp;&nbsp;This&nbsp;is&nbsp;implemented&nbsp;as&nbsp;a&nbsp;nested&nbsp;<a href="__builtin__.html#dict">dict</a>.<br>
+&nbsp;<br>
+Multiple&nbsp;SmpaInstances&nbsp;can&nbsp;be&nbsp;placed&nbsp;in&nbsp;a&nbsp;hierarchy&nbsp;by&nbsp;a<br>
+SmapServer,&nbsp;or&nbsp;a&nbsp;single&nbsp;one&nbsp;can&nbsp;be&nbsp;the&nbsp;root.<br>
+&nbsp;<br>
+To&nbsp;use&nbsp;this&nbsp;class,&nbsp;create&nbsp;a&nbsp;<a href="__builtin__.html#dict">dict</a>&nbsp;with&nbsp;the&nbsp;resource&nbsp;structure&nbsp;you<br>
+want&nbsp;to&nbsp;use&nbsp;for&nbsp;your&nbsp;sMAP&nbsp;server.&nbsp;&nbsp;The&nbsp;objects&nbsp;at&nbsp;the&nbsp;leaves&nbsp;of<br>
+the&nbsp;tree&nbsp;should&nbsp;be&nbsp;SmapPoints.&nbsp;&nbsp;For&nbsp;instance,&nbsp;you&nbsp;could&nbsp;do:<br>
+&nbsp;<br>
+data&nbsp;=&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'0'&nbsp;:&nbsp;{&nbsp;'sensor'&nbsp;:&nbsp;{'0'&nbsp;:&nbsp;SmapPoint.SmapPoint(SmapPoint.Formatting(unit='kW',multiplier=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;divisor=None,type='electric',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctype='sensor'),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SmapPoint.Parameter(interval=1,&nbsp;time='second'))&nbsp;}&nbsp;}&nbsp;}<br>
+inst&nbsp;=&nbsp;<a href="#SmapInstance">SmapInstance</a>.<a href="#SmapInstance">SmapInstance</a>(data,&nbsp;key="mykey")<br>
+&nbsp;<br>
+This&nbsp;will&nbsp;create&nbsp;the&nbsp;hierarchy&nbsp;/data/0/sensor/0/&nbsp;with&nbsp;the<br>
+appropriate&nbsp;sMAP&nbsp;resources&nbsp;at&nbsp;the&nbsp;leaves.&nbsp;&nbsp;The&nbsp;key&nbsp;argument&nbsp;is<br>
+used&nbsp;to&nbsp;name&nbsp;a&nbsp;file&nbsp;for&nbsp;storing&nbsp;reporting&nbsp;instances,&nbsp;and&nbsp;should&nbsp;be<br>
+different&nbsp;for&nbsp;every&nbsp;sMAP&nbsp;instance&nbsp;run&nbsp;on&nbsp;the&nbsp;same&nbsp;host.<br>
+&nbsp;<br>
+You&nbsp;can&nbsp;then&nbsp;add&nbsp;data&nbsp;to&nbsp;the&nbsp;instance&nbsp;using&nbsp;the&nbsp;SmapPoint.add<br>
+method;&nbsp;for&nbsp;instance,&nbsp;you&nbsp;could&nbsp;do<br>
+&nbsp;<br>
+inst['data']['0']['sensor']['0'].add(SmapPoint.Reading(time=now,&nbsp;value=0,&nbsp;min=None,&nbsp;max=None))<br>
+&nbsp;<br>
+After&nbsp;you've&nbsp;added&nbsp;the&nbsp;data&nbsp;making&nbsp;up&nbsp;a&nbsp;single&nbsp;reading,&nbsp;call&nbsp;push.&nbsp;&nbsp;This&nbsp;lets<br>
+the&nbsp;service&nbsp;know&nbsp;that&nbsp;the&nbsp;current&nbsp;state&nbsp;of&nbsp;the&nbsp;<a href="#SmapInstance">SmapInstance</a><br>
+represents&nbsp;a&nbsp;consistent&nbsp;state,&nbsp;and&nbsp;listeners&nbsp;registered&nbsp;for<br>
+updates&nbsp;should&nbsp;be&nbsp;sent&nbsp;the&nbsp;new.data.<br>
+&nbsp;<br>
+inst.<a href="#SmapInstance-push">push</a>()<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;only&nbsp;want&nbsp;to&nbsp;push&nbsp;data&nbsp;in&nbsp;part&nbsp;of&nbsp;the&nbsp;tree,&nbsp;you&nbsp;can&nbsp;call<br>
+<a href="#SmapInstance-push">push</a>()&nbsp;with&nbsp;a&nbsp;"dirty&nbsp;path":&nbsp;for&nbsp;instance,&nbsp;you&nbsp;could&nbsp;say<br>
+&nbsp;<br>
+inst.<a href="#SmapInstance-push">push</a>(dirty_path='~/data/0')<br>
+&nbsp;<br>
+This&nbsp;will&nbsp;only&nbsp;push&nbsp;data&nbsp;to&nbsp;clients&nbsp;which&nbsp;have&nbsp;asked&nbsp;for&nbsp;a&nbsp;report<br>
+overlapping&nbsp;this&nbsp;path.&nbsp;&nbsp;The&nbsp;tilde&nbsp;(~)&nbsp;refers&nbsp;to&nbsp;the&nbsp;root&nbsp;of&nbsp;this<br>
+sMAP&nbsp;instance.<br>
+&nbsp;<br>
+You&nbsp;may&nbsp;set&nbsp;the&nbsp;local&nbsp;timezone&nbsp;during&nbsp;instantiation&nbsp;using&nbsp;the<br>
+"timezone"&nbsp;keyword&nbsp;arg&nbsp;--&nbsp;the&nbsp;value&nbsp;should&nbsp;be&nbsp;a&nbsp;value&nbsp;from&nbsp;the&nbsp;tz<br>
+database&nbsp;(zone.tab)&nbsp;file.&nbsp;&nbsp;On&nbsp;many&nbsp;systems,&nbsp;this&nbsp;is&nbsp;available&nbsp;in<br>
+/usr/share/zoneinfo/zone.tab<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="newlib.SmapInstance.html#SmapInstance">SmapInstance</a></dd>
+<dd><a href="__builtin__.html#dict">__builtin__.dict</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SmapInstance-__init__"><strong>__init__</strong></a>(self, data_hierarchy, key<font color="#909090">='SmapInstance'</font>, timezone<font color="#909090">='America/Los_Angeles'</font>)</dt></dl>
+
+<dl><dt><a name="SmapInstance-is_alive"><strong>is_alive</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="SmapInstance-push"><strong>push</strong></a>(self, dirty_path<font color="#909090">='/'</font>)</dt></dl>
+
+<dl><dt><a name="SmapInstance-start"><strong>start</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="__builtin__.html#dict">__builtin__.dict</a>:<br>
+<dl><dt><a name="SmapInstance-__cmp__"><strong>__cmp__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__cmp__">__cmp__</a>(y)&nbsp;&lt;==&gt;&nbsp;cmp(x,y)</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__contains__"><strong>__contains__</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-__contains__">__contains__</a>(k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__delitem__"><strong>__delitem__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__delitem__">__delitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;del&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__eq__"><strong>__eq__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__eq__">__eq__</a>(y)&nbsp;&lt;==&gt;&nbsp;x==y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__ge__"><strong>__ge__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__ge__">__ge__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;=y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__gt__"><strong>__gt__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__gt__">__gt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__iter__">__iter__</a>()&nbsp;&lt;==&gt;&nbsp;iter(x)</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__le__"><strong>__le__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__le__">__le__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;=y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__len__">__len__</a>()&nbsp;&lt;==&gt;&nbsp;len(x)</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__lt__"><strong>__lt__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__lt__">__lt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__ne__"><strong>__ne__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__ne__">__ne__</a>(y)&nbsp;&lt;==&gt;&nbsp;x!=y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__setitem__"><strong>__setitem__</strong></a>(...)</dt><dd><tt>x.<a href="#SmapInstance-__setitem__">__setitem__</a>(i,&nbsp;y)&nbsp;&lt;==&gt;&nbsp;x[i]=y</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-__sizeof__"><strong>__sizeof__</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-__sizeof__">__sizeof__</a>()&nbsp;-&gt;&nbsp;size&nbsp;of&nbsp;D&nbsp;in&nbsp;memory,&nbsp;in&nbsp;bytes</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-clear"><strong>clear</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-clear">clear</a>()&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Remove&nbsp;all&nbsp;items&nbsp;from&nbsp;D.</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-copy"><strong>copy</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-copy">copy</a>()&nbsp;-&gt;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-get"><strong>get</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-get">get</a>(k[,d])&nbsp;-&gt;&nbsp;D[k]&nbsp;if&nbsp;k&nbsp;in&nbsp;D,&nbsp;else&nbsp;d.&nbsp;&nbsp;d&nbsp;defaults&nbsp;to&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-has_key"><strong>has_key</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-has_key">has_key</a>(k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-items"><strong>items</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-items">items</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;(key,&nbsp;value)&nbsp;pairs,&nbsp;as&nbsp;2-tuples</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-iteritems"><strong>iteritems</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-iteritems">iteritems</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;(key,&nbsp;value)&nbsp;items&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-iterkeys"><strong>iterkeys</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-iterkeys">iterkeys</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;keys&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-itervalues"><strong>itervalues</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-itervalues">itervalues</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;values&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-keys"><strong>keys</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-keys">keys</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;keys</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-pop"><strong>pop</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-pop">pop</a>(k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;remove&nbsp;specified&nbsp;key&nbsp;and&nbsp;return&nbsp;the&nbsp;corresponding&nbsp;value.<br>
+If&nbsp;key&nbsp;is&nbsp;not&nbsp;found,&nbsp;d&nbsp;is&nbsp;returned&nbsp;if&nbsp;given,&nbsp;otherwise&nbsp;KeyError&nbsp;is&nbsp;raised</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-popitem"><strong>popitem</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-popitem">popitem</a>()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;remove&nbsp;and&nbsp;return&nbsp;some&nbsp;(key,&nbsp;value)&nbsp;pair&nbsp;as&nbsp;a<br>
+2-tuple;&nbsp;but&nbsp;raise&nbsp;KeyError&nbsp;if&nbsp;D&nbsp;is&nbsp;empty.</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-setdefault"><strong>setdefault</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-setdefault">setdefault</a>(k[,d])&nbsp;-&gt;&nbsp;D.<a href="#SmapInstance-get">get</a>(k,d),&nbsp;also&nbsp;set&nbsp;D[k]=d&nbsp;if&nbsp;k&nbsp;not&nbsp;in&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-update"><strong>update</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-update">update</a>(E,&nbsp;**F)&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Update&nbsp;D&nbsp;from&nbsp;<a href="__builtin__.html#dict">dict</a>/iterable&nbsp;E&nbsp;and&nbsp;F.<br>
+If&nbsp;E&nbsp;has&nbsp;a&nbsp;.<a href="#SmapInstance-keys">keys</a>()&nbsp;method,&nbsp;does:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;E:&nbsp;D[k]&nbsp;=&nbsp;E[k]<br>
+If&nbsp;E&nbsp;lacks&nbsp;.<a href="#SmapInstance-keys">keys</a>()&nbsp;method,&nbsp;does:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(k,&nbsp;v)&nbsp;in&nbsp;E:&nbsp;D[k]&nbsp;=&nbsp;v<br>
+In&nbsp;either&nbsp;case,&nbsp;this&nbsp;is&nbsp;followed&nbsp;by:&nbsp;for&nbsp;k&nbsp;in&nbsp;F:&nbsp;D[k]&nbsp;=&nbsp;F[k]</tt></dd></dl>
+
+<dl><dt><a name="SmapInstance-values"><strong>values</strong></a>(...)</dt><dd><tt>D.<a href="#SmapInstance-values">values</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;values</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="__builtin__.html#dict">__builtin__.dict</a>:<br>
+<dl><dt><strong>__hash__</strong> = None</dl>
+
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x7fdbee4a30c0&gt;<dd><tt>T.<a href="#SmapInstance-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<dl><dt><strong>fromkeys</strong> = &lt;built-in method fromkeys of type object at 0x1785450&gt;<dd><tt><a href="__builtin__.html#dict">dict</a>.<a href="#SmapInstance-fromkeys">fromkeys</a>(S[,v])&nbsp;-&gt;&nbsp;New&nbsp;<a href="__builtin__.html#dict">dict</a>&nbsp;with&nbsp;keys&nbsp;from&nbsp;S&nbsp;and&nbsp;values&nbsp;equal&nbsp;to&nbsp;v.<br>
+v&nbsp;defaults&nbsp;to&nbsp;None.</tt></dl>
+
+</td></tr></table></td></tr></table>
+</body></html>

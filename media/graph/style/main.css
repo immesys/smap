@@ -1,0 +1,36 @@
+  div.graph {
+    position: relative;
+    float: left;
+    width: 400px;
+    height: 300px;
+  }
+  div.range {
+    position: relative;
+    float: right;
+    clear: both;
+    width: 400px;
+    height: 100px;
+  }
+  div.widget {
+    position: relative;
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+  div.title {
+    text-align: center;
+    font-weight: normal;
+    font-size: large;
+  }
+  div.ylabel {
+    text-align: center;
+    font-weight: normal;
+    font-size: medium;
+  }
+  div.hover {
+    position: absolute;
+    z-index: 1000;
+  }
+  div.row {
+    clear: both;
+  }
+

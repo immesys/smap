@@ -1,0 +1,34 @@
+<html>
+ <head>
+  <link href="http://www.cs.berkeley.edu/~stevedh/newstyle.css" type="text/css" rel="stylesheet">
+
+  <title>sMAP Backend v2</title>
+ </head>
+ <body>
+  <script type="text/javascript">
+  </script>
+  <form method="GET" id="sub_form"></form>
+  <p>
+  </p>
+  <h2>Current status for {{sub}}</h2>
+  Dead threshold: {{deadthresh}}s alive: {{nalive}}/{{ntotal}}
+  <table border=1>
+   <tr>
+    <th>streamid</th>
+    <th>path</th>
+    <th>current timestamp</th> 
+    <th>current reading</th>
+    <th>ago</th>
+   </tr>
+   {% for stream, timestamp, reading, ago, color in latest %}
+    <tr style="background-color: {{color}};">
+     <td><a href="/smap/plot/{{stream.id}}">{{stream.id}}</a></td>
+     <td>{{stream.path}}</td>
+     <td>{{timestamp}}</td>
+     <td>{{reading}}</td>
+     <td>{{ago}}</td>
+    </tr>
+   {% endfor %}
+  </table>
+ </body>
+</html>

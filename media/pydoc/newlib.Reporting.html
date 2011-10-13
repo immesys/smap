@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module newlib.Reporting</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="newlib.html"><font color="#ffffff">newlib</font></a>.Reporting</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/sdawson/svn/code/smap/newlib/Reporting.py">/home/sdawson/svn/code/smap/newlib/Reporting.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="newlib.SmapHttp.html">newlib.SmapHttp</a><br>
+<a href="newlib.ThreadPool.html">newlib.ThreadPool</a><br>
+<a href="httplib.html">httplib</a><br>
+<a href="json.html">json</a><br>
+</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
+<a href="os.html">os</a><br>
+<a href="pickle.html">pickle</a><br>
+<a href="random.html">random</a><br>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+<a href="sys.html">sys</a><br>
+<a href="threading.html">threading</a><br>
+<a href="time.html">time</a><br>
+</td><td width="25%" valign=top><a href="urlparse.html">urlparse</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="__builtin__.html#dict">__builtin__.dict</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="newlib.Reporting.html#ReportingHttp">ReportingHttp</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="newlib.Reporting.html#ReportingHttpCollection">ReportingHttpCollection</a>
+</font></dt><dt><font face="helvetica, arial"><a href="newlib.Reporting.html#ReportingHttpCreate">ReportingHttpCreate</a>
+</font></dt><dt><font face="helvetica, arial"><a href="threading.html#Thread">threading.Thread</a>(<a href="threading.html#_Verbose">threading._Verbose</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="newlib.Reporting.html#Reporting">Reporting</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Reporting">class <strong>Reporting</strong></a>(<a href="threading.html#Thread">threading.Thread</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Manage&nbsp;delivering&nbsp;reports&nbsp;which&nbsp;have&nbsp;been&nbsp;installed.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="newlib.Reporting.html#Reporting">Reporting</a></dd>
+<dd><a href="threading.html#Thread">threading.Thread</a></dd>
+<dd><a href="threading.html#_Verbose">threading._Verbose</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Reporting-__init__"><strong>__init__</strong></a>(self, resource_root, report_file<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Reporting-create_report"><strong>create_report</strong></a>(self, reqobj)</dt></dl>
+
+<dl><dt><a name="Reporting-delete_report"><strong>delete_report</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Reporting-push"><strong>push</strong></a>(self, dirty_path<font color="#909090">='~/'</font>)</dt><dd><tt>can&nbsp;be&nbsp;called&nbsp;to&nbsp;"push"&nbsp;out&nbsp;new&nbsp;reports&nbsp;to&nbsp;any&nbsp;clients&nbsp;who<br>
+&nbsp;have&nbsp;asked&nbsp;to&nbsp;receive&nbsp;a&nbsp;stream&nbsp;of&nbsp;reports&nbsp;rather&nbsp;then&nbsp;a&nbsp;fixed<br>
+&nbsp;period<br>
+&nbsp;<br>
+if&nbsp;dirty_path&nbsp;is&nbsp;provided,&nbsp;it&nbsp;will&nbsp;only&nbsp;push&nbsp;out&nbsp;reports<br>
+&nbsp;where&nbsp;the&nbsp;request&nbsp;path&nbsp;starts&nbsp;with&nbsp;the&nbsp;request&nbsp;string&nbsp;specified.</tt></dd></dl>
+
+<dl><dt><a name="Reporting-report_get"><strong>report_get</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Reporting-report_list"><strong>report_list</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reporting-run"><strong>run</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reporting-update_report"><strong>update_report</strong></a>(self, name, reqobj)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>RETRY_TIMEOUT</strong> = 86400</dl>
+
+<hr>
+Methods inherited from <a href="threading.html#Thread">threading.Thread</a>:<br>
+<dl><dt><a name="Reporting-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reporting-getName"><strong>getName</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reporting-isAlive"><strong>isAlive</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reporting-isDaemon"><strong>isDaemon</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Reporting-is_alive"><strong>is_alive</strong></a> = isAlive(self)</dt></dl>
+
+<dl><dt><a name="Reporting-join"><strong>join</strong></a>(self, timeout<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Reporting-setDaemon"><strong>setDaemon</strong></a>(self, daemonic)</dt></dl>
+
+<dl><dt><a name="Reporting-setName"><strong>setName</strong></a>(self, name)</dt></dl>
+
+<dl><dt><a name="Reporting-start"><strong>start</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="threading.html#Thread">threading.Thread</a>:<br>
+<dl><dt><strong>daemon</strong></dt>
+</dl>
+<dl><dt><strong>ident</strong></dt>
+</dl>
+<dl><dt><strong>name</strong></dt>
+</dl>
+<hr>
+Data descriptors inherited from <a href="threading.html#_Verbose">threading._Verbose</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ReportingHttp">class <strong>ReportingHttp</strong></a>(<a href="__builtin__.html#dict">__builtin__.dict</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>A&nbsp;class&nbsp;to&nbsp;provide&nbsp;the&nbsp;HTTP&nbsp;layer&nbsp;on&nbsp;top&nbsp;of&nbsp;the&nbsp;actual&nbsp;reporting&nbsp;object<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="newlib.Reporting.html#ReportingHttp">ReportingHttp</a></dd>
+<dd><a href="__builtin__.html#dict">__builtin__.dict</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ReportingHttp-__init__"><strong>__init__</strong></a>(self, report)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="__builtin__.html#dict">__builtin__.dict</a>:<br>
+<dl><dt><a name="ReportingHttp-__cmp__"><strong>__cmp__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__cmp__">__cmp__</a>(y)&nbsp;&lt;==&gt;&nbsp;cmp(x,y)</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__contains__"><strong>__contains__</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-__contains__">__contains__</a>(k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__delitem__"><strong>__delitem__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__delitem__">__delitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;del&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__eq__"><strong>__eq__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__eq__">__eq__</a>(y)&nbsp;&lt;==&gt;&nbsp;x==y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__ge__"><strong>__ge__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__ge__">__ge__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;=y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__gt__"><strong>__gt__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__gt__">__gt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&gt;y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__iter__">__iter__</a>()&nbsp;&lt;==&gt;&nbsp;iter(x)</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__le__"><strong>__le__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__le__">__le__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;=y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__len__">__len__</a>()&nbsp;&lt;==&gt;&nbsp;len(x)</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__lt__"><strong>__lt__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__lt__">__lt__</a>(y)&nbsp;&lt;==&gt;&nbsp;x&lt;y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__ne__"><strong>__ne__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__ne__">__ne__</a>(y)&nbsp;&lt;==&gt;&nbsp;x!=y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__setitem__"><strong>__setitem__</strong></a>(...)</dt><dd><tt>x.<a href="#ReportingHttp-__setitem__">__setitem__</a>(i,&nbsp;y)&nbsp;&lt;==&gt;&nbsp;x[i]=y</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-__sizeof__"><strong>__sizeof__</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-__sizeof__">__sizeof__</a>()&nbsp;-&gt;&nbsp;size&nbsp;of&nbsp;D&nbsp;in&nbsp;memory,&nbsp;in&nbsp;bytes</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-clear"><strong>clear</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-clear">clear</a>()&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Remove&nbsp;all&nbsp;items&nbsp;from&nbsp;D.</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-copy"><strong>copy</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-copy">copy</a>()&nbsp;-&gt;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-get"><strong>get</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-get">get</a>(k[,d])&nbsp;-&gt;&nbsp;D[k]&nbsp;if&nbsp;k&nbsp;in&nbsp;D,&nbsp;else&nbsp;d.&nbsp;&nbsp;d&nbsp;defaults&nbsp;to&nbsp;None.</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-has_key"><strong>has_key</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-has_key">has_key</a>(k)&nbsp;-&gt;&nbsp;True&nbsp;if&nbsp;D&nbsp;has&nbsp;a&nbsp;key&nbsp;k,&nbsp;else&nbsp;False</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-items"><strong>items</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-items">items</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;(key,&nbsp;value)&nbsp;pairs,&nbsp;as&nbsp;2-tuples</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-iteritems"><strong>iteritems</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-iteritems">iteritems</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;(key,&nbsp;value)&nbsp;items&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-iterkeys"><strong>iterkeys</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-iterkeys">iterkeys</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;keys&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-itervalues"><strong>itervalues</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-itervalues">itervalues</a>()&nbsp;-&gt;&nbsp;an&nbsp;iterator&nbsp;over&nbsp;the&nbsp;values&nbsp;of&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-keys"><strong>keys</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-keys">keys</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;keys</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-pop"><strong>pop</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-pop">pop</a>(k[,d])&nbsp;-&gt;&nbsp;v,&nbsp;remove&nbsp;specified&nbsp;key&nbsp;and&nbsp;return&nbsp;the&nbsp;corresponding&nbsp;value.<br>
+If&nbsp;key&nbsp;is&nbsp;not&nbsp;found,&nbsp;d&nbsp;is&nbsp;returned&nbsp;if&nbsp;given,&nbsp;otherwise&nbsp;KeyError&nbsp;is&nbsp;raised</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-popitem"><strong>popitem</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-popitem">popitem</a>()&nbsp;-&gt;&nbsp;(k,&nbsp;v),&nbsp;remove&nbsp;and&nbsp;return&nbsp;some&nbsp;(key,&nbsp;value)&nbsp;pair&nbsp;as&nbsp;a<br>
+2-tuple;&nbsp;but&nbsp;raise&nbsp;KeyError&nbsp;if&nbsp;D&nbsp;is&nbsp;empty.</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-setdefault"><strong>setdefault</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-setdefault">setdefault</a>(k[,d])&nbsp;-&gt;&nbsp;D.<a href="#ReportingHttp-get">get</a>(k,d),&nbsp;also&nbsp;set&nbsp;D[k]=d&nbsp;if&nbsp;k&nbsp;not&nbsp;in&nbsp;D</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-update"><strong>update</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-update">update</a>(E,&nbsp;**F)&nbsp;-&gt;&nbsp;None.&nbsp;&nbsp;Update&nbsp;D&nbsp;from&nbsp;<a href="__builtin__.html#dict">dict</a>/iterable&nbsp;E&nbsp;and&nbsp;F.<br>
+If&nbsp;E&nbsp;has&nbsp;a&nbsp;.<a href="#ReportingHttp-keys">keys</a>()&nbsp;method,&nbsp;does:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;k&nbsp;in&nbsp;E:&nbsp;D[k]&nbsp;=&nbsp;E[k]<br>
+If&nbsp;E&nbsp;lacks&nbsp;.<a href="#ReportingHttp-keys">keys</a>()&nbsp;method,&nbsp;does:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for&nbsp;(k,&nbsp;v)&nbsp;in&nbsp;E:&nbsp;D[k]&nbsp;=&nbsp;v<br>
+In&nbsp;either&nbsp;case,&nbsp;this&nbsp;is&nbsp;followed&nbsp;by:&nbsp;for&nbsp;k&nbsp;in&nbsp;F:&nbsp;D[k]&nbsp;=&nbsp;F[k]</tt></dd></dl>
+
+<dl><dt><a name="ReportingHttp-values"><strong>values</strong></a>(...)</dt><dd><tt>D.<a href="#ReportingHttp-values">values</a>()&nbsp;-&gt;&nbsp;list&nbsp;of&nbsp;D's&nbsp;values</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="__builtin__.html#dict">__builtin__.dict</a>:<br>
+<dl><dt><strong>__hash__</strong> = None</dl>
+
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x7f87635f40c0&gt;<dd><tt>T.<a href="#ReportingHttp-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<dl><dt><strong>fromkeys</strong> = &lt;built-in method fromkeys of type object at 0xab1770&gt;<dd><tt><a href="__builtin__.html#dict">dict</a>.<a href="#ReportingHttp-fromkeys">fromkeys</a>(S[,v])&nbsp;-&gt;&nbsp;New&nbsp;<a href="__builtin__.html#dict">dict</a>&nbsp;with&nbsp;keys&nbsp;from&nbsp;S&nbsp;and&nbsp;values&nbsp;equal&nbsp;to&nbsp;v.<br>
+v&nbsp;defaults&nbsp;to&nbsp;None.</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ReportingHttpCollection">class <strong>ReportingHttpCollection</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ReportingHttpCollection-__init__"><strong>__init__</strong></a>(self, report)</dt></dl>
+
+<dl><dt><a name="ReportingHttpCollection-http_delete"><strong>http_delete</strong></a>(self, resource, query)</dt></dl>
+
+<dl><dt><a name="ReportingHttpCollection-http_get"><strong>http_get</strong></a>(self, resource, query)</dt></dl>
+
+<dl><dt><a name="ReportingHttpCollection-http_post"><strong>http_post</strong></a>(self, resource, query, postobject)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ReportingHttpCreate">class <strong>ReportingHttpCreate</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="ReportingHttpCreate-__init__"><strong>__init__</strong></a>(self, report)</dt></dl>
+
+<dl><dt><a name="ReportingHttpCreate-http_post"><strong>http_post</strong></a>(self, resource, query, postobject)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-path_segments"><strong>path_segments</strong></a>(path)</dt></dl>
+</td></tr></table>
+</body></html>

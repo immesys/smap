@@ -1,0 +1,22 @@
+<html>
+ <head>
+  <script type="text/javascript" src="/media/smap/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/media/smap/js/jquery.simplemodal.js"></script>
+ </head>
+ <body>
+ <div id="modalwindow">
+   <a href="none" id"modal"> HI </a>
+ </div>
+
+<script type="text/javascript">
+  function myclick() {
+    $.modal(document.getElementById("modalwindow"));
+  }
+</script>
+
+<form>
+ <input type="button" onclick="javascript: myclick();" value="Click me">
+</form>
+
+ </body>
+</html>

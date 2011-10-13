@@ -1,0 +1,17 @@
+Install OS X:
+py26-django
+py26-mysql
+py26-mptt
+py26-numpy
+
+Install Ubuntu:
+apt-get install python-scipy python-numpy python-mysqldb python-dateutil python-django-tagging libprotoc-dev protobuf-c-compiler python-cjson autoconf libprotobuf-c0-dev swig python-dev
+
+tar xvfz powerdb/bin/django-mptt.tgz
+cd pythondb/bin/django-mptt
+python setup.py install
+
+cd powerdb/readingdb
+autoreconf -i
+./configure
+make

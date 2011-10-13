@@ -1,0 +1,248 @@
+<html>
+ <head>
+  <script type="text/javascript" src="/media/jquery-1.5.2/jquery-1.5.2.min.js"></script>
+  <script type="text/javascript" src="/media/jquery-1.5.2/jquery.cookie.js"></script>
+  <script type="text/javascript" src="/media/jquery-1.5.2/jquery.hotkeys.js"></script>
+  <script type="text/javascript" src="/media/jsTree/jquery.jstree.js"></script>
+  <script type="text/javascript" src="/media/smap/js/print_r.js"></script>
+  <style type="text/css">
+    .demo, .demo input, .jstree-dnd-helper, #vakata-contextmenu { font-size:10px; font-family:Verdana; }
+    .demo { width: 50%; float: left }
+  </style>
+
+ </head>
+ <body>
+  <input type="button" id="new_collection" value="New">
+  <input type="button" id="rename_collection" value="Rename">
+  <input type="button" id="remove_collection" value="Delete">
+  <div>
+   <div id="new_tree", class="demo"></div>
+   <div id="current_tree" class="demo"></div>
+  </div>
+  <script type="text/javascript">
+var type_data = {
+      "container" : {
+        "valid_children" : "all",
+      },
+      "subscription" : {
+        "valid_children" : [ "point" ],
+      },
+      "stream" : {
+        "valid_children" : "none",
+      },
+      "point" : {
+        "valid_children" : [ "stream" ]
+      }
+    };
+var tree_id = 2;
+
+function do_create (parentid, title, position, refid, type_, newobj, rlbk) {
+  $.ajax({
+    async: false,
+    type: "POST",
+    url: '/smap/tree/create/' + tree_id + '/',
+    data: {
+      parent: parentid,
+      title: title,
+      position: position,
+      type: type_,
+      refid: refid,
+    },
+    failure: function (r) { alert("FAIL") },
+    success: function (r) {
+       if (r.status) {
+         $(newobj).attr("id", r.id); // data.rslt.obj
+       } else {
+         $.jstree.rollback(rlbk); // data.rlbk
+       }
+    }
+  });
+}
+function do_move (myid, parentid, position, newojb, rlbk) {
+  $.ajax({
+     async: false,
+     type: "POST", 
+     url: "/smap/tree/move/" + tree_id + "/",
+     data: {
+       refid: myid,
+       parent: parentid,
+       position: position,
+     },
+     success: function (r) {
+       if (!r.status) { 
+         $.jstree.rollback(rlbk);
+       }
+     }
+   });
+}
+function do_rename (myid, title, newojb, rlbk) {
+  $.ajax({
+     async: false,
+     type: "POST", 
+     url: "/smap/tree/rename/" + tree_id + "/",
+     data: {
+       refid: myid,
+       title: title,
+     },
+     success: function (r) {
+       if (!r.status) { 
+         $.jstree.rollback(rlbk);
+       }
+     }
+   });
+}
+function do_remove (refid, newobj, rlbk) {
+  $.ajax({
+     async: false,
+     type: "POST", 
+     url: "/smap/tree/remove/" + tree_id + "/",
+     data: {
+       refid: refid,
+     },
+     success: function (r) {
+       if (!r.status) { 
+         $.jstree.rollback(rlbk);
+       }
+     }
+   });
+}
+
+$(function() {
+ $("#new_tree")
+ .jstree({
+  "plugins" : [ "json_data", "themes", "dnd", "crrm", "ui", "types" ],
+  "crrm" : { "move" : { 
+    "always_copy" : "multitree",
+    "open_onmove" : false,
+    "check_move" : function (m) {
+       return ((m.rt != m.ot && m.np.attr("rel") == "container")||
+               m.o.attr("rel") == "container" ||
+               (m.np.attr("rel") == "container" &&
+                m.o.attr("movable") == "true"));
+      }
+     }
+    },
+  "json_data" : {
+    "progressive_render" : true,
+     "ajax" : {
+       "url" : "/smap/tree/2",
+       }
+  },
+  "types" : {
+    "types" : type_data,
+    },
+   "core" : {
+     "animation" : 100,
+   }
+ })
+ .bind("create.jstree", function (e, data) {
+    if (data.rslt.parent != -1) {
+      parentid = data.rslt.parent.attr("id");
+    } else {
+      parentid = -1;
+    }
+    position = data.rslt.position;
+    title = data.rslt.name;
+    do_create(parentid, title, position, null, "container", data.rslt.obj, data.rslt.rlbk)
+ })
+ .bind("remove.jstree", function (e, data) {
+   refid = data.rslt.obj.attr("id");
+   do_remove(refid, data.rslt.obj, data.rslt.rlbk);
+ })
+ .bind("move_node.jstree", function (e, data) {
+   // when we grab things from one tree and drop them into another, we want to
+   // be able to move around that heirarchy but none of the children.
+   if (data.rslt.rt != data.rslt.ot) {     
+     data.rslt.no.attr("movable", "true");
+     if (data.rslt.o.attr("rel") == "stream" ||
+         data.rslt.o.attr("rel") == "point") {
+         path = $("#current_tree").jstree("get_path", data.rslt.o);
+         n = data.rslt.o.attr("rel") == "point" ? 4 : 3;
+         $("#current_tree").jstree("set_text", data.rslt.no,
+             path.slice(path.length - n).join("/"));
+     }
+   }
+   if (data.rslt.np != -1) {
+     parentid = data.rslt.np.attr("id");
+     if (parentid == "new_tree")
+       parentid = -1;
+   } else {
+     parentid = -1
+   }
+   position = data.rslt.cp;
+
+   if (data.rslt.ot != data.rslt.rt) {
+     // in this case, we're copying into the new tree so we actually want to do a create.
+     if (data.rslt.no.attr("rel") != "point") {
+       refid = data.rslt.no.attr("refid");
+       title = null;
+     } else {
+       refid = data.rslt.op.attr("refid");
+       title = $("#current_tree").jstree("get_text", data.rslt.o);
+     }
+     type = data.rslt.no.attr("rel");
+     do_create(parentid, title, position, refid, type, data.rslt.no, data.rslt.rlbk);
+   } else {
+     // otherwise just do a move
+     myid = data.rslt.o.attr("id").replace("copy_", "");
+     do_move(myid, parentid, position, data.rslt.o, data.rslt.rlbk);
+   }
+ })
+ .bind("rename.jstree", function (e, data) {
+    refid = data.rslt.obj.attr("id");
+    title = data.rslt.new_name;
+    do_rename(refid, title, data.rslt.obj, data.rslt.rlbk);
+ })
+;
+
+ $("#new_collection").click(function () {
+    $("#new_tree").jstree("create", null, null, 
+    {data: "A new name", attr: {rel: "container"}});
+  });
+
+ $("#rename_collection").click(function () {
+     // can only rename containers
+     if ($("#new_tree").jstree("get_selected").attr("rel") == "container") {
+       $("#new_tree").jstree("rename");
+     }
+  });
+
+ $("#remove_collection").click(function () {
+     selected = $("#new_tree").jstree("get_selected");
+     if (selected.attr("movable") ||
+         selected.attr("rel") == "container") {
+       $("#new_tree").jstree("remove", selected);
+     }
+  });
+});
+
+$(function() {
+ $("#current_tree")
+ .jstree({
+   "plugins" : [ "json_data", "themes", "dnd", "crrm", "types", "ui"],
+   "crrm" : { "move" : { 
+     "always_copy" : "multitree",
+     "check_move" : function (m) { 
+       // only allow moves to other trees from the source tree
+       return (m.rt == $("#new_tree"));
+      }
+     } 
+    },
+  "dnd" : {
+  },
+   "json_data" :  {
+   //      "progressive_render" : true,
+"ajax" : {
+ //    "url" : "/media/smap/js/jsTree/tree.json",
+    "url" : "/smap/tree/1",
+       }
+//"data" : { "data" : [] },
+     },
+  "types" : {
+    "types" : type_data,
+    }
+   })
+  });
+  </script>
+ </body>
+</html>

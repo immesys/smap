@@ -1,0 +1,55 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: package newlib</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>newlib</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/sdawson/svn/code/smap/newlib/__init__.py">/home/sdawson/svn/code/smap/newlib/__init__.py</a></font></td></tr></table>
+    <p><tt>newlib&nbsp;sMAP&nbsp;library<br>
+&nbsp;<br>
+The&nbsp;newlib&nbsp;library&nbsp;contains&nbsp;a&nbsp;reference&nbsp;implementation&nbsp;of&nbsp;the&nbsp;sMAP<br>
+application&nbsp;protocol&nbsp;for&nbsp;exposing&nbsp;physical&nbsp;data&nbsp;over&nbsp;the&nbsp;HTTP.<br>
+&nbsp;<br>
+All&nbsp;sMAP&nbsp;sources&nbsp;available&nbsp;in&nbsp;this&nbsp;distribution&nbsp;are&nbsp;implemented&nbsp;using<br>
+this&nbsp;library;&nbsp;the&nbsp;simplest&nbsp;one&nbsp;is&nbsp;devices.test.TestSmap.<br>
+&nbsp;<br>
+To&nbsp;build&nbsp;a&nbsp;new&nbsp;sMAP&nbsp;source,&nbsp;first&nbsp;create&nbsp;one&nbsp;or&nbsp;more&nbsp;new&nbsp;SmapInstances<br>
+--&nbsp;instructions&nbsp;for&nbsp;doing&nbsp;so&nbsp;are&nbsp;in&nbsp;that&nbsp;module's&nbsp;pydoc.&nbsp;&nbsp;Then,&nbsp;start<br>
+the&nbsp;sMAP&nbsp;server&nbsp;using&nbsp;the&nbsp;SmapHttp.start_server&nbsp;utility&nbsp;function.<br>
+Finally,&nbsp;implement&nbsp;an&nbsp;updater&nbsp;to&nbsp;add&nbsp;new&nbsp;records&nbsp;to&nbsp;the&nbsp;sMAP&nbsp;feed.<br>
+You&nbsp;may&nbsp;find&nbsp;the&nbsp;util.RateTimer&nbsp;class&nbsp;useful&nbsp;for&nbsp;implementing&nbsp;a<br>
+periodic&nbsp;update.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Package Contents</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="newlib.Reporting.html">Reporting</a><br>
+<a href="newlib.SmapContext.html">SmapContext</a><br>
+<a href="newlib.SmapHttp.html">SmapHttp</a><br>
+<a href="newlib.SmapInstance.html">SmapInstance</a><br>
+</td><td width="25%" valign=top><a href="newlib.SmapPoint.html">SmapPoint</a><br>
+<a href="newlib.SmapStatus.html">SmapStatus</a><br>
+<a href="newlib.SmapSubscription.html">SmapSubscription</a><br>
+<a href="newlib.ThreadPool.html">ThreadPool</a><br>
+</td><td width="25%" valign=top><a href="newlib.modbus.html"><strong>modbus</strong>&nbsp;(package)</a><br>
+<a href="newlib.modbustcp.html"><strong>modbustcp</strong>&nbsp;(package)</a><br>
+<a href="newlib.series.html">series</a><br>
+<a href="newlib.smaplog.html">smaplog</a><br>
+</td><td width="25%" valign=top><a href="newlib.testsmap.html">testsmap</a><br>
+<a href="newlib.util.html">util</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__all__</strong> = ['SmapPoint', 'SmapHttp', 'SmapInstance', 'smaplog', 'series', 'util']</td></tr></table>
+</body></html>
