@@ -5,10 +5,10 @@ import revproxy
 
 proxy_conf = {
     'destination' : 'http://local.cs.berkeley.edu:8079',
-#    'prefix' : 'backend'
+    'prefix' : 'backend'
     }
 
-def proxy(request, url):
+def proxy(request):
     qparams = {}
     if hasattr(settings, 'ARD_KEY'):
         qparams['key'] = settings.ARD_KEY
@@ -22,4 +22,4 @@ def proxy(request, url):
     else:
         request.META["QUERY_STRING"] = qs
 
-    return revproxy.proxy_request(request, path=urllib.quote(url), **proxy_conf)
+    return revproxy.proxy_request(request, **proxy_conf)

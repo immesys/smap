@@ -7,6 +7,14 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
  $(function() {
      var last_selected = [];
 
+     function getTag(ob) {
+       if ($.type(ob) == 'string') {
+         return ob;
+       } else {
+         return ob.tag;
+       }
+     }
+
      function buildClauses(p) {
         var clauses = [];
         for (var i = 0; i < p.length; i++) {
@@ -23,6 +31,9 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
             "restrict" in tree_order[0]) {
           clauses.push('(' + tree_order[0].restrict + ')');          
         }
+       if (p.length + 1 < tree_order.length) {
+          clauses.push('(has ' + getTag(tree_order[p.length + 1]) + ')');
+       }
         return clauses.join(" and ");
      }
 

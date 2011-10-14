@@ -67,12 +67,12 @@ def dumpcsv(obj, fp):
 def current_datetime(request):
     return HttpResponse(time.time())
 
-def plot(request, streamid=None):
+def plot(request, tree=2):
     """Render the plotting gui using a template
     """
     t = loader.get_template('templates/plot.html')
     c = Context({
-        'streamid' : streamid,
         'user' : request.user,
+        'default_tree_id' : str(tree),
         })
     return HttpResponse(t.render(c))

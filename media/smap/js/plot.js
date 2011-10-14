@@ -9,6 +9,8 @@ var tz = 0;
 // normally we want to repect the user's settings, but when
 // initializing pick defaults.
 var initializing = true;
+var pending_loads = 0;
+var last_render = 0;
 
 var plot_data = {};
 
@@ -171,6 +173,7 @@ function loadData(streamid) {
     "&endtime=" + escape(end);
 
   var startLoadTime = new Date();
+  pending_loads ++;
   $.get(query, 
         function() {
           var streamid_ = streamid;
@@ -186,8 +189,10 @@ function loadData(streamid) {
               plot_data[streamid_]['tags']['LoadTime'] = (endLoadTime - startLoadTime) + 
                 "ms, " + data.length + " points";
               updateLegend();
+              pending_loads--;
               updatePlot();
             } else {
+              pending_loads--;
               plot_data[streamid_]['latest_timestamp'] = undefined;
             }
           }
@@ -305,6 +310,10 @@ function updateAxisLabels() {
 
 function updatePlot() {
   var ddata = [];
+  var now = (new Date()).getTime();
+  if (pending_loads > 0 && 
+      now - last_render < 2000) return;
+  last_render = now;
   for (var streamid in plot_data) {
     if (plot_data[streamid]["hidden"]) {
       ddata.push([]);
