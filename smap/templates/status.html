@@ -79,17 +79,7 @@
       }
 
       $(document).ready(function () {
-
-        $.get("/backend/api/query/Metadata__SourceName", function (resp) {
-          var sources = eval(resp);
-          for (var i = 0; i < sources.length; i++) {
-            $("#sources")
-              .append($("<option>", { value: sources[i] })
-              .text(sources[i]));
-          }
-        });
-
-        $("#sources").change(function () {
+        function updateStreams() {
            var source = $("#sources").val();
            var converter = new AnyTime.Converter( { format: datefmt });
            var whence = converter.parse($("#date").val()).getTime();
@@ -122,9 +112,19 @@
                                        
                       $("#statustable").append(elt);
                    }
-           });
-        });
-      });
+                 });
+               }
+           $("#sources").change(updateStreams);
+           $.get("/backend/api/query/Metadata__SourceName", function (resp) {
+              var sources = eval(resp);
+              for (var i = 0; i < sources.length; i++) {
+                $("#sources")
+                  .append($("<option>", { value: sources[i] })
+                  .text(sources[i]));
+              }
+              updateStreams();
+             });
+          });
     </script>
   </body>
 </html>
