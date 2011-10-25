@@ -4,7 +4,7 @@ import powerdb2.settings as settings
 import revproxy
 
 proxy_conf = {
-    'destination' : 'http://local.cs.berkeley.edu:8079',
+    'destination' : settings.ARD_URL,
     'prefix' : 'backend'
     }
 

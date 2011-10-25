@@ -1,6 +1,6 @@
 
 function tag_escape(x){
-  return x.replace('"', '\"');// escape(x).replace(/\//g, '__');
+  return x.replace('"', '\\\"');
 }
 
 function makeTagTree(div, tree_order, selectcb, deselectcb) {
