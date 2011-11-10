@@ -70,7 +70,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
        $(last_selected).each(
          function () {
            for (var i = 0; i < new_selection.length; i++) {
-             if (this.toString() == new_selection[i][0].toString()) {
+             if (this[0].toString() == new_selection[i][0].toString()) {
                return;
              }
            }
