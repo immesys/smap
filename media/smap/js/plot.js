@@ -146,7 +146,7 @@ function chooseAxis(streamid) {
 function updateMeta(streamid) {
   $.get(url + "/backend/api/tags/uuid/" + streamid,
         function(data) {
-          var obj = eval('[' + data + ']')[0][0];
+          var obj = eval(data)[0];
           plot_data[streamid]['tags'] = obj;
           plot_data[streamid]['label'] = obj['uuid'];          
           if (plot_data[streamid]["yaxis"] == -1)
@@ -418,7 +418,7 @@ function autoUpdatePoll() {
     $.get(query, function () {
         var streamid_ = streamid;
         return function(resp) {
-          var data = eval("(" + resp + ")");
+          var data = eval(resp);
           data = data[0]['Readings'];
           if (!(streamid_ in plot_data)) return;
           if (data.length <= 0) return;
