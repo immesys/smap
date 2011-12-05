@@ -247,12 +247,14 @@ function updateLegend() {
                              "<span id=\"axis_" + streamid + "\" >" +
                                "<input type=\"radio\" id=\"axis_y1_" + streamid + "\" name=\"axis_" + 
                                       streamid +  "\" value=\"1\" " + y1checked + "/>" +
-                                 "<label for=\"axis_y1_" + streamid + "\">y1</label>" +
+                               "<label for=\"axis_y1_" + streamid + "\">y1</label>" +
                                "<input type=\"radio\" id=\"axis_y2_" + streamid + "\" name=\"axis_" + 
                                       streamid + "\" value=\"2\" " + y2checked + "/>" +
                                  "<label for=\"axis_y2_" + streamid + "\">y2</label>" +
                              "</span>" +
                              "<button id=\"more_" + streamid + "\"/>   " +
+                             "<a href=\"/backend/api/data/uuid/" + streamid + 
+                                "?format=csv&tags=" + "\">[csv]</a>    " + 
                              label_pieces.join(" :: ") + 
                              "</div>");
     div.append(makeTagTable(tags));
