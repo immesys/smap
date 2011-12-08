@@ -1,0 +1,231 @@
+<html>
+<head>
+<title>sMAP Datacenter PUE Calculator</title>
+<link rel="stylesheet" type="text/css" href="/media/smap/css/anytimec.css"/>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/media/smap/js/anytimec.js"></script>
+<script type="text/javascript" src="/media/smap/js/lib.js"></script>
+<script type="text/javascript" src="/media/smap/js/cvi_busy_lib.js"></script>
+
+<style type="text/css">
+.status-selected {
+	background-color: #fffacd;
+}
+.td_status {
+	width: 20px;
+	height: 20px;
+}
+</style>
+</head>
+
+<body>
+<div id="main">
+Datacenter Power Usage Effectiveness (PUE) Calculator |||| 
+Select Datacenter:
+<select id="dcenter">
+	<option value="165Cory">165 Cory</option>
+	<option value="420Soda">420 Soda</option>
+	<option value="340Soda">340 Soda</option>
+	<option value="290Soda">290 Soda</option>
+	<option value="288Soda">288 Soda</option>
+	<option value="287Soda">287 Soda</option>
+</select>
+<br>
+Start Time: <input type = "text" id="date2" size=34>
+End Time:<input type="text" id="date" size=34>
+Average Over:
+<select id="timeranges">
+	<option value="1000">Seconds (raw data)</option>
+	<option value="60000">Minutes</option>
+	<option value="3600000">Hours</option>
+	<option value="86400000">Days</option>
+	<option value="2592000000">Months (appx.)</option>
+	<option value="31536000000">Years</option>
+</select>
+<input type = "button" value = "Load/Refresh" id="refresh">
+
+<br>
+
+<div id="status" style="float: left; width: 30%; height: 100%">
+	<table id="0"></table>
+</div>
+
+<div id="status2" style="float: left; width: 30%; height: 100%">
+	<table id="1"></table>
+</div>
+
+<div id="status3" style="float: left; width: 30%; height: 100%">
+	<table id="2"></table>
+</div>
+<div id="PUEoutD" style="float: left; width: 10%; height: 100%">
+	<table id="PUEOUT"></table>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+var datacenters = [];
+datacenters["165Cory"] = ["73a95168-646e-5fa3-8bb1-402938158277","5b78547e-8b82-50a7-858e-d33a2378c742","eb54067c-4a90-58e0-9226-dba32d5d62b5"];
+datacenters["420Soda"] = ["e0ca5c25-09a1-51e6-9dca-03262243cb48","f06b6a1f-ed13-520f-9109-59281e206a28","fbdf45b0-499a-578d-80e0-c94f50ce75af"];
+datacenters["340Soda"] = ["0c355e60-5a65-5164-a63e-e4f3b263aadc","8a8ce93d-35bf-53df-92f0-d5467bd5c779","1a019f41-dd39-563d-9857-49a28e38385c"];
+datacenters["290Soda"] = ["9823fe2e-b4d3-5968-8c82-8db9f9d456e3","9caa2b81-a75c-594e-9b61-d25254725e47","c7b53d42-a1a1-5ac0-9a42-e6f6dfa1105c"];
+datacenters["288Soda"] = ["5f4f9a1e-6019-588c-989e-e6787cc83ae0","0ef84a93-ad79-5b8a-a540-49c0860f5c61"];
+datacenters["287Soda"] = ["e5f220f0-56fa-50ba-a7d8-ff6ed20c3ed6","833a4cd9-c57e-55c1-a40b-75ad7036980d"];
+var dcent_uuids = datacenters[$("#dcenter").val()];
+var saveddata = [];
+var avgbucketSize = 1000;
+var datefmt = "%W %M %e, %Y %H:%i";
+var converter = new AnyTime.Converter( { format: datefmt });
+var nowDate = new Date();
+$("#date").val(converter.format(nowDate));
+var startDate = new Date();
+startDate.setTime(nowDate - 200000);
+$("#date2").val(converter.format(startDate));
+
+AnyTime.picker( "date", { format: datefmt, firstDOW: 0 } );
+
+AnyTime.picker( "date2", { format: datefmt, firstDOW: 0 } );
+
+$("#refresh").click(function() {
+	saveddata = []; //resets saved data to prevent mismatched data
+	updateDisp()
+});
+
+$("#timeranges").change(function() {
+	avgbucketSize = $("#timeranges").val();
+});
+
+$("#dcenter").change(function() {
+	dcent_uuids = datacenters[$("#dcenter").val()];
+});
+
+
+//#####################################################################################
+//     Need to implement better system for longer periods of time                      
+//     -Currently gets stuck with over 4/5 months of data                           
+//     Select one day/per month or something similar to compute the average for a month
+//#####################################################################################
+
+Object.customlen = function custlen(dictionaryLikeObject){
+	//Gives length for an associative array
+	var tracker = 0;
+	var key;
+	for (key in dictionaryLikeObject){
+		if (dictionaryLikeObject.hasOwnProperty(key)){
+			tracker++;
+		}
+	}
+	return tracker;
+}
+
+function dataOrganizer(fetchedData){
+	//creates and returns a stream from fetchedData
+	streams = [];
+	for (var i = 0; i < fetchedData[0]['Readings'].length; i++) {
+		streams.push([
+			fetchedData[0]['Readings'][i][0], 
+			fetchedData[0]['Readings'][i][1]]);} //builds streams[] as a list of [time, reading]
+	return streams;
+}
+
+
+function buildAverages(inputdata, endtime, starttime){
+	// this function takes in a saveddata associated array of the format
+	var averaged = [];
+	newendtime = endtime - endtime%avgbucketSize; //rounds endtime down
+	newstarttime = starttime + (avgbucketSize - starttime%avgbucketSize); //rounds starttime up
+	for (var nums2 = 0; nums2<Object.customlen(saveddata); nums2++){ //for each UUID
+		var thisUUIDoutput = [];
+		var currentUUID = dcent_uuids[nums2];
+		var thisUUIDdata = inputdata[currentUUID];
+		var upperbound = newendtime;
+		var lowerbound = newendtime - avgbucketSize;
+		while(thisUUIDdata.length != 0){ //goes through the thisUUIDdata list
+			var avgtopTracker = 0;
+			var counter = 0;
+			while(thisUUIDdata.length != 0 && thisUUIDdata[thisUUIDdata.length-1][0]>lowerbound ){
+				counter++;
+				avgtopTracker += thisUUIDdata.pop()[1];
+			}
+			theCalcdAvg = avgtopTracker/counter;
+			if (!isNaN(theCalcdAvg)){
+				//Prevents NaNs in raw seconds output
+				thisUUIDoutput.push([upperbound, theCalcdAvg]);
+			}
+			upperbound = lowerbound;
+			lowerbound = upperbound - avgbucketSize;
+		}
+		averaged[currentUUID] = thisUUIDoutput;
+	}
+	console.log(averaged);
+	return averaged;
+}
+
+function dispOut(saveddata){
+		$("#2").empty(); //explicitly empties the last data column for datacenters with only two data sources
+	for (var nums = 0; nums<Object.customlen(saveddata); nums++){
+
+		var tableId = "#" + nums;   
+		$(tableId).empty();
+		var coltitle = $("<tr><td>" + "Device: " + dcent_uuids[nums] + "</td></tr>");
+		$(tableId).append(coltitle);
+		for (var i = 0; i < saveddata[dcent_uuids[nums]].length; i++) {
+			var elt = $("<tr id=\"" + dcent_uuids[nums] + "\"><td>"
+				+ new Date(saveddata[dcent_uuids[nums]][i][0]) + " &nbsp; " + Math.floor(saveddata[dcent_uuids[nums]][i][1]*1000)/1000
+				+ " kW" + "</td></tr>");        
+			$(tableId).append(elt);
+		}
+
+		$("#PUEOUT").empty();
+		var outPUEtitle = $("<tr><td>Calculated PUEs:</td></tr>");
+		$("#PUEOUT").append(outPUEtitle);
+		var output_PUE = [];
+}
+		for (var datalen = 0; datalen < saveddata[dcent_uuids[0]].length; datalen++){
+			var facilitypower = 0
+			for (var newnums = 0; newnums<Object.customlen(saveddata); newnums++){
+				facilitypower += saveddata[dcent_uuids[newnums]][datalen][1]
+			}
+			serverpower = saveddata[dcent_uuids[Object.customlen(saveddata)-1]][datalen][1];
+			output_PUE.push(facilitypower / serverpower);
+		}
+
+		for (var dataseq = 0; dataseq < output_PUE.length; dataseq++){
+			var outPUE = $("<tr><td>" + Math.floor(output_PUE[dataseq]*1000)/1000 +  "</td></tr>");
+			$("#PUEOUT").append(outPUE);
+		}
+	
+}
+
+
+function updateDisp(){
+	var converter = new AnyTime.Converter( { format: datefmt });
+	var endtime = converter.parse($("#date").val()).getTime();
+	var starttime = converter.parse($("#date2").val()).getTime();
+	var ctrl = getBusyOverlay(document.getElementById("status")); //a single busy overlay for the first status column, to indicate no data
+	for (var uuid_curr = 0; uuid_curr < dcent_uuids.length; uuid_curr++){
+		$.ajax({ //switched to ajax because it allows asynchronous loading to be turned off
+			async: false,
+			type: 'GET',
+			url: "http://new.openbms.org/backend/api/data/uuid/" + escape(dcent_uuids[uuid_curr]) + "?starttime=" + escape(starttime) + "&endtime=" + escape(endtime),
+			//update this url to /backend/api/data/uuid/ +therest for production
+			success: function(resp) {
+				latest = [];
+				latest = eval(resp);
+				calcdStreams = dataOrganizer(latest);
+				saveddata[latest[0]['uuid']] = calcdStreams; //builds saveddata as an associative array of uuids and stream for each uuid
+				ctrl.remove(); //removes busy overlay
+				if (Object.customlen(saveddata) == dcent_uuids.length){ //anything in here is called once saveddata is completely populated
+					newavg = buildAverages(saveddata, endtime, starttime); //builds averages and saves them
+					dispOut(newavg); //function that displays columns of data after fetching and calculations are complete
+				}
+			}
+		});
+	}
+}
+</script>
+</body>
+</html>

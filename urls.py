@@ -24,11 +24,14 @@ urlpatterns = patterns('',
 
     (r'^api/', include('powerdb2.api.urls')),
 
+    (r'^datacenter/', include('powerdb2.datacenter.urls')),
+
     (r'^robots.txt.*', 'powerdb2.views.robots'),
 
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root' : settings.STATIC_DOC_ROOT, 'show_indexes' : True}),
 
     (r'^$', 'powerdb2.views.root'),
-
+ 
+    
 )
