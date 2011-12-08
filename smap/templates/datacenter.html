@@ -210,7 +210,7 @@ function updateDisp(){
 		$.ajax({ //switched to ajax because it allows asynchronous loading to be turned off
 			async: false,
 			type: 'GET',
-			url: "http://new.openbms.org/backend/api/data/uuid/" + escape(dcent_uuids[uuid_curr]) + "?starttime=" + escape(starttime) + "&endtime=" + escape(endtime),
+			url: "/backend/api/data/uuid/" + escape(dcent_uuids[uuid_curr]) + "?starttime=" + escape(starttime) + "&endtime=" + escape(endtime),
 			//update this url to /backend/api/data/uuid/ +therest for production
 			success: function(resp) {
 				latest = [];
