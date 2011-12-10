@@ -173,14 +173,14 @@ function loadData(streamid) {
     "&endtime=" + escape(end);
 
   var startLoadTime = new Date();
+  console.log("starting load");
   pending_loads ++;
   $.get(query, 
         function() {
           var streamid_ = streamid;
           return function(resp) {
+            data = eval(resp);
             var endLoadTime = new Date();
-            var data = eval(resp);
-            console.log("response was " + resp.length + " bytes");
             data = data[0]['Readings'];
             plot_data[streamid_]['data'] = data;
             if (data.length > 0) {
@@ -196,7 +196,7 @@ function loadData(streamid) {
               plot_data[streamid_]['latest_timestamp'] = undefined;
             }
           }
-        }());
+        }(), "text");
   return;
 }
 
@@ -220,6 +220,16 @@ function makeAxisFn(eltid) {
     plot_data[eltid]["yaxis"] = 
       $("input:radio[name=axis_" + eltid + "]:checked").val();
   }
+}
+
+function updateCsvLink(ref) {
+  var range = getTimeRange();
+  var start = range[0], end = range[1];
+  var query = "/backend/api/data/uuid/" + escape(ref) +
+    "?starttime=" + escape(start) + 
+    "&endtime=" + escape(end) + 
+    "&format=csv&tags=";
+  document.getElementById("csv_" + ref).href = query;
 }
 
 function updateLegend() {
@@ -253,8 +263,8 @@ function updateLegend() {
                                  "<label for=\"axis_y2_" + streamid + "\">y2</label>" +
                              "</span>" +
                              "<button id=\"more_" + streamid + "\"/>   " +
-                             "<a href=\"/backend/api/data/uuid/" + streamid + 
-                                "?format=csv&tags=" + "\">[csv]</a>    " + 
+                               "<a onclick=\"updateCsvLink(\'" + streamid + "\')\" "  + 
+                                 "id=csv_" + streamid + " >[csv]</a>    " +
                              label_pieces.join(" :: ") + 
                              "</div>");
     div.append(makeTagTable(tags));
@@ -270,6 +280,7 @@ function updateLegend() {
     $("#hide_" + streamid).button({
       label: plot_data[streamid]["hidden"] ?
                "Show" : "Hide"});
+    updateCsvLink(streamid);
     $("#hide_" + streamid).click(function() {
       var streamid_ = streamid;
       return function() { 
