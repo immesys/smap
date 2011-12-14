@@ -69,7 +69,6 @@ function selectSubStream(streamid, range) {
   var wsz = (range[1] - range[0]) / 1000;
   var rv = plot_data[streamid].tags.uuid;
   var best_str = -1;
-  console.log("window size: " + wsz);
   for (var i = 0; i < plot_data[streamid]["substreams"].length; i++) {
     var sstr = plot_data[streamid]["substreams"][i];
     if ("Operator" in sstr["Metadata"]["Extra"] && 
@@ -109,16 +108,16 @@ function mungeTimes(data, tz) {
 
 function makeSubstreamTable(streamid) {
   var substreams = plot_data[streamid]["substreams"];
-  var table = "<table class=\"tag_table\">";
+  var table = "<table class=\"tag_table substream-table\">";
   table += "<tr><th>Substreams</th><td>";
-  var ops = []
+  var ops = [];
+  if (substreams == undefined) return "";
   for (var i = 0; i < substreams.length; i++) { 
     ops.push(substreams[i].Metadata.Extra.Operator);
   }
   ops.sort();
   for (var i = 0; i < ops.length; i ++) {
     var klass = "substream";
-    console.log(ops[i] + " " + plot_data[streamid]["selected_operator"]);
     if (ops[i] == plot_data[streamid]["selected_operator"]) {
       klass = "substream-selected";
     }
@@ -127,7 +126,6 @@ function makeSubstreamTable(streamid) {
     if (i < ops.length - 1) table += ",&nbsp;";
   }
   table += "</td></tr></table>";
-  console.log(substreams);
   if (ops.length) {
     return $(table);
   } else {
@@ -252,7 +250,6 @@ function loadData(streamid) {
     "&endtime=" + escape(end);
 
   var startLoadTime = new Date();
-  console.log("starting load");
   pending_loads ++;
   $.get(query, 
         function() {
