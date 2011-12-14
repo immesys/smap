@@ -170,3 +170,12 @@ h2 {
   background-color: #eee;
   padding: 2px;
 }
+
+.substream {
+ color: gray;
+}
+
+.substream-selected {
+ color: black;
+ font-style: italic;
+}

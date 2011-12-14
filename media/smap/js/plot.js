@@ -58,6 +58,41 @@ function getTimeRange() {
   return [start, end];
 }
 
+// this map tells what operators we know about, and when to select which one.  
+// if the view range is bigger than the threshold here we'll use it.
+var known_operators = ['subsample-300','subsample-3600'];
+var known_operator_thresholds = [3600 * 24 * 7, 3600 * 24 * 30];
+
+// select a substream based on the time range and available substreams
+// this function is an embarrassment.
+function selectSubStream(streamid, range) {
+  var wsz = (range[1] - range[0]) / 1000;
+  var rv = plot_data[streamid].tags.uuid;
+  var best_str = -1;
+  console.log("window size: " + wsz);
+  for (var i = 0; i < plot_data[streamid]["substreams"].length; i++) {
+    var sstr = plot_data[streamid]["substreams"][i];
+    if ("Operator" in sstr["Metadata"]["Extra"] && 
+        $.inArray(sstr.Metadata.Extra.Operator, known_operators) > -1) {
+      for (var j = 0; j < known_operator_thresholds.length; j++) {           
+        if (wsz > known_operator_thresholds[j] && 
+            j > best_str &&
+            known_operators[j] == sstr.Metadata.Extra.Operator) {
+          rv = sstr.uuid;
+          best_str = j;
+        }
+      }
+    }
+  }
+  // save what operator we're using for this stream
+  if (best_str >= 0) {
+    plot_data[streamid]["selected_operator"] = known_operators[best_str];
+  } else {
+    plot_data[streamid]["selected_operator"] = "";
+  }
+  return rv;
+}
+
 // change the dates in the data series "data" to be in timezone "tz".
 // should be a zoneinfo timezone; this is for flot so the display ends
 // up right.
@@ -69,6 +104,34 @@ function mungeTimes(data, tz) {
   var offset = point.getLocalOffset();
   for (i = 0; i < data.length; i++) {
     data[i][0] -= offset * 60 * 1000;
+  }
+}
+
+function makeSubstreamTable(streamid) {
+  var substreams = plot_data[streamid]["substreams"];
+  var table = "<table class=\"tag_table\">";
+  table += "<tr><th>Substreams</th><td>";
+  var ops = []
+  for (var i = 0; i < substreams.length; i++) { 
+    ops.push(substreams[i].Metadata.Extra.Operator);
+  }
+  ops.sort();
+  for (var i = 0; i < ops.length; i ++) {
+    var klass = "substream";
+    console.log(ops[i] + " " + plot_data[streamid]["selected_operator"]);
+    if (ops[i] == plot_data[streamid]["selected_operator"]) {
+      klass = "substream-selected";
+    }
+    var onclick = ""; // 'onclick="plot_data[\'' + streamid + "\']['selected_operator'] = '" + ops[i] + "'\"";
+    table += "<a class=\"" + klass + "\" " + onclick + ">" + ops[i] + "</a>";
+    if (i < ops.length - 1) table += ",&nbsp;";
+  }
+  table += "</td></tr></table>";
+  console.log(substreams);
+  if (ops.length) {
+    return $(table);
+  } else {
+    return;
   }
 }
 
@@ -144,6 +207,7 @@ function chooseAxis(streamid) {
 
 // load the metadata for streamid "streamid" and plot
 function updateMeta(streamid) {
+  plot_data[streamid]['load_count'] = 2;
   $.get(url + "/backend/api/tags/uuid/" + streamid,
         function(data) {
           var obj = eval(data)[0];
@@ -152,8 +216,22 @@ function updateMeta(streamid) {
           if (plot_data[streamid]["yaxis"] == -1)
             chooseAxis(streamid);
 
-          loadData(streamid);
+           if (!(--plot_data[streamid]['load_count'])) {
+             loadData(streamid);
+           }
         });
+
+  // load any substreams too so we can create them in the gui
+  $.post(url + "/backend/api/query",
+         "select * where Metadata/Extra/SourceStream = '" + streamid + "'",
+         function (data) {
+           plot_data[streamid]["substreams"] = data;
+
+           if (!(--plot_data[streamid]['load_count'])) {
+             loadData(streamid);
+           }
+
+         }, "json");
 }
 
 // reload all data for all series
@@ -167,8 +245,9 @@ function reloadData() {
 function loadData(streamid) {
   var range = getTimeRange();
   var start = range[0], end = range[1];
+  var substream_id = selectSubStream(streamid, range);
 
-  var query = "/backend/api/data/uuid/" + escape(streamid) +
+  var query = "/backend/api/data/uuid/" + escape(substream_id) +
     "?starttime=" + escape(start) + 
     "&endtime=" + escape(end);
 
@@ -267,6 +346,7 @@ function updateLegend() {
                                  "id=csv_" + streamid + " >[csv]</a>    " +
                              label_pieces.join(" :: ") + 
                              "</div>");
+    div.append(makeSubstreamTable(streamid));
     div.append(makeTagTable(tags));
     div.append("<div style=\"clear: left; margin: 12px;\"></div>");
     $("#description").append(div);

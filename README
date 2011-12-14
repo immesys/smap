@@ -1,17 +1,12 @@
-Install OS X:
-py26-django
-py26-mysql
-py26-mptt
-py26-numpy
+Included modified files:
+plot.js
+tagtree.js 
+---both from powerdb2/media/smap/js
 
-Install Ubuntu:
-apt-get install python-scipy python-numpy python-mysqldb python-dateutil python-django-tagging libprotoc-dev protobuf-c-compiler python-cjson autoconf libprotobuf-c0-dev swig python-dev
+status.html
+---from powerdb2/smap/templates
 
-tar xvfz powerdb/bin/django-mptt.tgz
-cd pythondb/bin/django-mptt
-python setup.py install
+needed to change all 'backend/api/<something>' to 'http://new.openbms.org/backend/api/<something>'
+Then, use CORS firefox extension to prevent single origin from blocking external load
 
-cd powerdb/readingdb
-autoreconf -i
-./configure
-make
+https://addons.mozilla.org/en-US/firefox/addon/forcecors/

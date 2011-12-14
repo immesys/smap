@@ -1,13 +1,22 @@
 
+// escape tag names and values for inclusion in a query
 function tag_escape(x){
   return x.replace('"', '\\\"');
 }
 
+// Build a tag tree
+// div: jquery div selected, place to build tree
+// tree_order: an array representing the tree configuration; a list of
+//   level configurations
+// selectcb: callback called with (path, [uuid list], label text)
+//   arguments when streams are selected in the tree
+// deselectcb: callback called with (uuid) when a stream is deselected
 function makeTagTree(div, tree_order, selectcb, deselectcb) {
  $(function() {
      var last_selected = [];
      var separator = '/';
 
+     // get the tag name a particular tree level uses
      function getTag(ob) {
        if ($.type(ob) == 'string') {
          return ob;
@@ -16,6 +25,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
        } else if ("prefixTag" in ob) {
          return ob.prefixTag;
        }
+       return "";
      }
 
      function isPrefixTree() {
@@ -23,6 +33,8 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
          "prefixTag" in tree_order[tree_order.length-1];
      }
 
+     // build the "where" part of a query based on a path and a
+     // particular node.
      function buildClauses(p, node) {
         var clauses = [];
         for (var i = 0; i < Math.min(p.length, tree_order.length); i++) {
@@ -30,6 +42,8 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
             clauses.push(tree_order[i] + " = \"" + tag_escape(p[i]) + '"');
           } else if ("tag" in tree_order[i]) {
             clauses.push(tree_order[i].tag + " = \"" + tag_escape(p[i]) + '"');
+
+            // add any restrict clauses
             if ("restrict" in tree_order[i]) {
               clauses.push('(' + tree_order[i].restrict + ')');
             }
@@ -47,12 +61,16 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
             "restrict" in tree_order[0]) {
           clauses.push('(' + tree_order[0].restrict + ')');          
         }
+       // make sure the results have the tag for the tree level we're
+       // interested in.
        if (p.length + 1 < tree_order.length) {
           clauses.push('(has ' + getTag(tree_order[p.length + 1]) + ')');
        }
-        return clauses.join(" and ");
+       return clauses.join(" and ");
      }
 
+     // update the list of stream uuids which are currently
+     // selected in the tree.
      function updateSelection() {
        var uuids = [];
        var new_selection = [];
@@ -74,10 +92,13 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
                return;
              }
            }
+           // call deselctcb on all of the streams which are no longer
+           // selected
            deselectcb(this[0]);
          });
 
        $(new_selection).each(
+         // look up the uuid for each newly selected stream.
          function () {
            var p = this[0];
            var node = this[1];
@@ -105,6 +126,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
                         "seriesLabel" in tree_order[p.length - 1]) {
                      seriesLabel = tree_order[p.length - 1].seriesLabel;
                    }
+                   // trigger the select callback with the uuid
                    selectcb(p, obj, seriesLabel);
                  });
            
@@ -122,29 +144,41 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
                "type" : "POST",
                "url" : "/backend/api/query",
                "data" : function (n) {
+                 // load data for a tree level
+                 // generate the query which is send as the POST payload
                  var p = $(div).jstree("get_path", n);
                  var query = "select distinct ";
                  if (n == -1) {
                    p = [];
                  }
+                 // find the tag name we want to select at this level
                  if (p.length < tree_order.length ||
                      (p.length >= tree_order.length && isPrefixTree(tree_order))) {
                    if ($.type(tree_order[p.length]) == "string") {
+                     // if it's a normal tree, this means the tag at this level
                      query += tree_order[p.length];
                    } else if (p.length >= tree_order.length - 1 &&
                              "prefixTag" in tree_order[tree_order.length-1]) {
+                     // if it's a prefixTree and we're generating
+                     // that, we always use the prefixTag
                      query += tree_order[tree_order.length-1].prefixTag;
                    } else if ("tag" in tree_order[p.length]) {
+                     // it might be a config dict at this level rather
+                     // than a string.
                      query += tree_order[p.length].tag;
                    }
+                   // build the where clauses which enforce our
+                   // selections for the levels above us.
                    var clauses = buildClauses(p, n);
                    if (clauses.length)
                      query += " where " + clauses;
                    console.log(query);
                    return query;
-                 }
+                 } 
+                 return undefined;
                },
                "success" : function (resp, status, req, node) {
+                 // process the returned query data into a jstree struct
                  var obj = eval(resp);
                  var rv = [];
                  var p = $(div).jstree("get_path", node);
@@ -196,6 +230,10 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
                                       },
                                       "state": tags[tv]};
                    }
+
+                   // we have to sort after splitting up the prefix
+                   // tag value since we only want to sort based on
+                   // this one particular level.
                    rv.sort(function (x, y) {
                              if (sortfn) return sortfn(x.data.title, y.data.title);
                              else return (x.data.title < y.data.title ? -1 : 
