@@ -196,6 +196,11 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
                                       },
                                       "state": tags[tv]};
                    }
+                   rv.sort(function (x, y) {
+                             if (sortfn) return sortfn(x.data.title, y.data.title);
+                             else return (x.data.title < y.data.title ? -1 : 
+                                          (x.data.title > y.data.title ? 1 : 0));
+                           });
                  }
                  return rv;
                }
