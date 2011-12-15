@@ -4,6 +4,18 @@ function tag_escape(x){
   return x.replace('"', '\\\"');
 }
 
+// open a path in the tree
+// path: an array of strings, one per level of the tree to open.
+// nodes will be loaded if not already there
+
+function treeOpenPath(path) {
+  if (path.length) {
+    var thisseg = unescape(path.shift());
+    $("#tree_div").jstree("open_node", $("#tree_div a:contains('" + thisseg + "') :parent"), 
+                          function () { treeOpenPath(path); });
+  }
+}
+
 // Build a tag tree
 // div: jquery div selected, place to build tree
 // tree_order: an array representing the tree configuration; a list of
@@ -11,7 +23,7 @@ function tag_escape(x){
 // selectcb: callback called with (path, [uuid list], label text)
 //   arguments when streams are selected in the tree
 // deselectcb: callback called with (uuid) when a stream is deselected
-function makeTagTree(div, tree_order, selectcb, deselectcb) {
+function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
  $(function() {
      var last_selected = [];
      var separator = '/';
@@ -198,7 +210,8 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
                                 "title": obj[i], 
                                 "icon": icon,
                               },
-                              "state": state};
+                              "state": state,
+                             }
                    }
                  } else if (isPrefixTree()) {
                    // build a prefix tree 
@@ -253,6 +266,9 @@ function makeTagTree(div, tree_order, selectcb, deselectcb) {
              })
        .bind("deselect_node.jstree", function(event, data) {
                updateSelection();
+             })
+       .bind("loaded.jstree", function() {
+               treeOpenPath(openpath);
              });
    });
 }

@@ -12,6 +12,7 @@ import random
 import uuid
 
 from django.db import models
+from django.contrib.auth.models import User
 
 def new_key():
     return ''.join(map(lambda x: random.choice(string.letters + string.digits),
@@ -28,6 +29,7 @@ class Subscription(models.Model):
     key = models.CharField(max_length=36, default=new_key)
     public = models.BooleanField(default=True)
     description = models.CharField(max_length=256)
+    owner = models.ForeignKey(User)
     class Meta:
         db_table = u'subscription'
 

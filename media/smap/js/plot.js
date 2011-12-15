@@ -156,7 +156,7 @@ function makeTagTable(obj) {
 }
 
 // add a stream to the current plot
-function addStream(streamid, labels) {
+function addStream(streamid, labels, hidden) {
   for (var i = 0; i < labels.length; i++) { 
     labels[i] = labels[i].replace(/__/g, "/"); 
   }
@@ -164,6 +164,8 @@ function addStream(streamid, labels) {
     "data" : [],
     "seriesLabel" : labels,
     "yaxis" : -1,
+    "hidden" : hidden == undefined ? false : hidden,
+    "data_loaded" : false,
   };
   updateMeta(streamid);
 }
@@ -235,6 +237,7 @@ function updateMeta(streamid) {
 // reload all data for all series
 function reloadData() {
   for (var streamid in plot_data) {
+    plot_data[streamid]["data_loaded"] = false;
     loadData(streamid);
   }
 }
@@ -248,6 +251,10 @@ function loadData(streamid) {
   var query = "/backend/api/data/uuid/" + escape(substream_id) +
     "?starttime=" + escape(start) + 
     "&endtime=" + escape(end);
+  if (plot_data[streamid]["hidden"]) {
+    updateLegend();
+    return;
+  }
 
   var startLoadTime = new Date();
   pending_loads ++;
@@ -259,6 +266,7 @@ function loadData(streamid) {
             var endLoadTime = new Date();
             data = data[0]['Readings'];
             plot_data[streamid_]['data'] = data;
+            plot_data[streamid_]['data_loaded'] = true;
             if (data.length > 0) {
               plot_data[streamid_]['latest_timestamp'] = data[data.length - 1][0];
               mungeTimes(data, plot_data[streamid_]["tags"]["Properties"]["Timezone"]);
@@ -364,7 +372,12 @@ function updateLegend() {
         plot_data[streamid_]["hidden"] = plot_data[streamid_]["hidden"] ? false : true;
         $("#hide_" + streamid_).button({label: plot_data[streamid_]["hidden"] ?
                                                  "Show" : "Hide"});
-        updatePlot();
+        if (!plot_data[streamid_]["hidden"] && 
+            !plot_data[streamid_]["data_loaded"]) {
+          loadData(streamid_);
+        } else {
+          updatePlot();
+        }
         return false;
       };
     }());
