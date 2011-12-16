@@ -23,6 +23,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+DATABASE_ENGINE = 'sqlite3'
+DATABASE_NAME = 'smapdb'
 # DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DATABASE_NAME = 'powerdb2'             # Or path to database file if using sqlite3.
 # DATABASE_USER = 'powerdb2'             # Not used with sqlite3.

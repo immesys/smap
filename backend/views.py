@@ -21,7 +21,8 @@ def proxy(request):
     if hasattr(settings, 'ARD_PRIVATE') and settings.ARD_PRIVATE:
         qparams['private'] = ''
 
-    if request.user.is_authenticated():
+    if hasattr(settings, 'DATABASE_ENGINE') and \
+            request.user.is_authenticated():
         keys = map(operator.attrgetter("key"),
                    models.Subscription.objects.filter((Q(can_view=request.user) | 
                                                        Q(owner=request.user)) &

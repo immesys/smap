@@ -71,8 +71,12 @@ def plot(request, tree=2):
     """Render the plotting gui using a template
     """
     t = loader.get_template('templates/plot.html')
-    c = Context({
-        'user' : request.user,
-        'default_tree_id' : str(tree),
-        })
+    if hasattr(settings, 'DATABASE_ENGINE'):
+        c = Context({
+                'user' : request.user,
+                'default_tree_id' : str(tree),
+                })
+    else:
+        c = Context({'default_tree_id' : str(tree)})
+
     return HttpResponse(t.render(c))
