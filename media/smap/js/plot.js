@@ -208,7 +208,7 @@ function chooseAxis(streamid) {
 // load the metadata for streamid "streamid" and plot
 function updateMeta(streamid) {
   plot_data[streamid]['load_count'] = 2;
-  $.get(url + "/backend/api/tags/uuid/" + streamid,
+  $.get(backend + "/api/tags/uuid/" + streamid + "?" + private_flags,
         function(data) {
           var obj = eval(data)[0];
           plot_data[streamid]['tags'] = obj;
@@ -222,7 +222,7 @@ function updateMeta(streamid) {
         });
 
   // load any substreams too so we can create them in the gui
-  $.post(url + "/backend/api/query",
+  $.post(backend + "/api/query?" + private_flags,
          "select * where Metadata/Extra/SourceStream = '" + streamid + "'",
          function (data) {
            plot_data[streamid]["substreams"] = data;
@@ -248,9 +248,10 @@ function loadData(streamid) {
   var start = range[0], end = range[1];
   var substream_id = selectSubStream(streamid, range);
 
-  var query = "/backend/api/data/uuid/" + escape(substream_id) +
+  var query = backend + "/api/data/uuid/" + escape(substream_id) +
     "?starttime=" + escape(start) + 
-    "&endtime=" + escape(end);
+    "&endtime=" + escape(end) +
+    "&" + private_flags;
   if (plot_data[streamid]["hidden"]) {
     updateLegend();
     return;
@@ -309,10 +310,11 @@ function makeAxisFn(eltid) {
 function updateCsvLink(ref) {
   var range = getTimeRange();
   var start = range[0], end = range[1];
-  var query = "/backend/api/data/uuid/" + escape(ref) +
+  var query = backend + "/api/data/uuid/" + escape(ref) +
     "?starttime=" + escape(start) + 
     "&endtime=" + escape(end) + 
-    "&format=csv&tags=";
+    "&format=csv&tags=" +
+    "&" + private_flags;
   document.getElementById("csv_" + ref).href = query;
 }
 
@@ -515,9 +517,9 @@ function autoUpdatePoll() {
     
   for (var streamid in plot_data) {
     if (!(plot_data[streamid]["latest_timestamp"])) continue;
-    var query = "/backend/api/data/uuid/" + escape(streamid) + 
+    var query = backend + "/api/data/uuid/" + escape(streamid) + 
       "?starttime=" + escape(plot_data[streamid]["latest_timestamp"]) + 
-      "&direction=next&limit=10000";
+      "&direction=next&limit=10000&" + private_flags;
     $.get(query, function () {
         var streamid_ = streamid;
         return function(resp) {

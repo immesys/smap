@@ -130,7 +130,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
            }
            console.log(query + clauses);
 
-           $.post("/backend/api/query", query + clauses,
+           $.post(backend + "/api/query?" + private_flags, query + clauses,
                  function (resp) {
                    var obj = eval(resp);
                    seriesLabel = undefined;
@@ -154,7 +154,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
              // appropriate children
              "ajax" : {
                "type" : "POST",
-               "url" : "/backend/api/query",
+               "url" : backend + "/api/query?" + private_flags,
                "data" : function (n) {
                  // load data for a tree level
                  // generate the query which is send as the POST payload

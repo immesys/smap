@@ -30,6 +30,7 @@ class Subscription(models.Model):
     public = models.BooleanField(default=True)
     description = models.CharField(max_length=256)
     owner = models.ForeignKey(User)
+    can_view = models.ManyToManyField(User, related_name='can_view')
     class Meta:
         db_table = u'subscription'
 

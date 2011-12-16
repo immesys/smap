@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     (r'^status/', include('powerdb2.status.urls')),
 
     (r'^backend/', include('powerdb2.backend.urls')),
+    (r'^backend_auth/', include('powerdb2.backend.urls')),
 
                        # (r'^api/', include('powerdb2.api.urls')),
 
