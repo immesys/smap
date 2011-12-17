@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import connection
 
 from django.db import connection
+from django.contrib.admin import site as adminsite
+# import django.contrib.auth.views as adminviews
 
 try:
     import simplejson as json
@@ -70,8 +72,10 @@ def current_datetime(request):
 def plot(request, tree=2):
     """Render the plotting gui using a template
     """
-    t = loader.get_template('templates/plot.html')
     if hasattr(settings, 'DATABASE_ENGINE'):
+        if not request.user.is_authenticated() and ( \
+            'login' in request.GET or 'login' in request.POST):
+            return adminsite.login(request)
         c = Context({
                 'user' : request.user,
                 'default_tree_id' : str(tree),
@@ -79,4 +83,5 @@ def plot(request, tree=2):
     else:
         c = Context({'default_tree_id' : str(tree)})
 
+    t = loader.get_template('templates/plot.html')
     return HttpResponse(t.render(c))
