@@ -68,12 +68,13 @@ Average Over:
 <script type="text/javascript">
 
 var datacenters = [];
+//datacenters should be of the format, datacenters[<RoomNumInQuotes>] = [CoolingUnit, CoolingUnit, PDU]; or [CoolingUnit, PDU]; 
 datacenters["165Cory"] = ["73a95168-646e-5fa3-8bb1-402938158277","5b78547e-8b82-50a7-858e-d33a2378c742","eb54067c-4a90-58e0-9226-dba32d5d62b5"];
-datacenters["420Soda"] = ["e0ca5c25-09a1-51e6-9dca-03262243cb48","f06b6a1f-ed13-520f-9109-59281e206a28","fbdf45b0-499a-578d-80e0-c94f50ce75af"];
-datacenters["340Soda"] = ["0c355e60-5a65-5164-a63e-e4f3b263aadc","8a8ce93d-35bf-53df-92f0-d5467bd5c779","1a019f41-dd39-563d-9857-49a28e38385c"];
-datacenters["290Soda"] = ["9823fe2e-b4d3-5968-8c82-8db9f9d456e3","9caa2b81-a75c-594e-9b61-d25254725e47","c7b53d42-a1a1-5ac0-9a42-e6f6dfa1105c"];
-datacenters["288Soda"] = ["5f4f9a1e-6019-588c-989e-e6787cc83ae0","0ef84a93-ad79-5b8a-a540-49c0860f5c61"];
-datacenters["287Soda"] = ["e5f220f0-56fa-50ba-a7d8-ff6ed20c3ed6","833a4cd9-c57e-55c1-a40b-75ad7036980d"];
+datacenters["420Soda"] = ["e0ca5c25-09a1-51e6-9dca-03262243cb48","f06b6a1f-ed13-520f-9109-59281e206a28","fbdf45b0-499a-578d-80e0-c94f50ce75af"]; 
+datacenters["340Soda"] = ["8a8ce93d-35bf-53df-92f0-d5467bd5c779","0c355e60-5a65-5164-a63e-e4f3b263aadc","1a019f41-dd39-563d-9857-49a28e38385c"];
+datacenters["290Soda"] = ["9823fe2e-b4d3-5968-8c82-8db9f9d456e3","81cf28e7-646b-5c61-a2dd-cb5e99d32e59","c7b53d42-a1a1-5ac0-9a42-e6f6dfa1105c"]; 
+datacenters["288Soda"] = ["5f4f9a1e-6019-588c-989e-e6787cc83ae0","0ef84a93-ad79-5b8a-a540-49c0860f5c61"];					 
+datacenters["287Soda"] = ["9caa2b81-a75c-594e-9b61-d25254725e47","e5f220f0-56fa-50ba-a7d8-ff6ed20c3ed6","833a4cd9-c57e-55c1-a40b-75ad7036980d"];
 var dcent_uuids = datacenters[$("#dcenter").val()];
 var saveddata = [];
 var avgbucketSize = 1000;
@@ -104,9 +105,12 @@ $("#dcenter").change(function() {
 
 
 //#####################################################################################
-//     Need to implement better system for longer periods of time                      
-//     -Currently gets stuck with over 4/5 months of data                           
-//     Select one day/per month or something similar to compute the average for a month
+//     Changelog:
+//		Fixed Feeds
+//		Fixed time display / modded to fit smaller screens
+//     ToDO:
+//              Better system for longer periods of time - select one day per month or something similar to compute average for a month
+//		Add Flot for graphing
 //#####################################################################################
 
 Object.customlen = function custlen(dictionaryLikeObject){
@@ -165,7 +169,10 @@ function buildAverages(inputdata, endtime, starttime){
 }
 
 function dispOut(saveddata){
-		$("#2").empty(); //explicitly empties the last data column for datacenters with only two data sources
+	$("#2").empty(); //explicitly empties the last data column for datacenters with only two data sources
+	var datefmt2 = "%W %M %e, %Y %H:%i:%s";
+	var converterDisp = new AnyTime.Converter( { format: datefmt2 });
+
 	for (var nums = 0; nums<Object.customlen(saveddata); nums++){
 
 		var tableId = "#" + nums;   
@@ -173,14 +180,16 @@ function dispOut(saveddata){
 		var coltitle = $("<tr><td>" + "Device: " + dcent_uuids[nums] + "</td></tr>");
 		$(tableId).append(coltitle);
 		for (var i = 0; i < saveddata[dcent_uuids[nums]].length; i++) {
+			var tempDate = new Date(saveddata[dcent_uuids[nums]][i][0]); 
+
 			var elt = $("<tr id=\"" + dcent_uuids[nums] + "\"><td>"
-				+ new Date(saveddata[dcent_uuids[nums]][i][0]) + " &nbsp; " + Math.floor(saveddata[dcent_uuids[nums]][i][1]*1000)/1000
+				+ converterDisp.format(tempDate) + " &nbsp; " + Math.floor(saveddata[dcent_uuids[nums]][i][1]*1000)/1000
 				+ " kW" + "</td></tr>");        
 			$(tableId).append(elt);
 		}
 
 		$("#PUEOUT").empty();
-		var outPUEtitle = $("<tr><td>Calculated PUEs:</td></tr>");
+		var outPUEtitle = $("<tr><td>PUE:</td></tr>");
 		$("#PUEOUT").append(outPUEtitle);
 		var output_PUE = [];
 }
