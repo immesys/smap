@@ -2,7 +2,7 @@
 <head>
 <title>sMAP Datacenter PUE Calculator</title>
 <link rel="stylesheet" type="text/css" href="/media/smap/css/anytimec.css"/>
-
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/media/smap/js/anytimec.js"></script>
@@ -22,7 +22,11 @@
 
 <body>
 <div id="main">
-Datacenter Power Usage Effectiveness (PUE) Calculator (built by <a href="http://www.ocf.berkeley.edu/~sagark">sagark</a>) |||| 
+Datacenter Power Usage Effectiveness (PUE) Calculator (built by <a href="http://www.ocf.berkeley.edu/~sagark">sagark</a>)
+<br>
+Start Time: <input type = "text" id="date2" size=34>
+End Time: <input type="text" id="date" size=34>
+<br>
 Select Datacenter:
 <select id="dcenter">
 	<option value="165Cory">165 Cory</option>
@@ -32,10 +36,10 @@ Select Datacenter:
 	<option value="288Soda">288 Soda</option>
 	<option value="287Soda">287 Soda</option>
 </select>
-<br>
-Start Time: <input type = "text" id="date2" size=34>
-End Time:<input type="text" id="date" size=34>
+
+
 Average Over:
+<span id="ranges">
 <select id="timeranges">
 	<option value="1000">Seconds (raw data)</option>
 	<option value="60000">Minutes</option>
@@ -44,8 +48,9 @@ Average Over:
 	<option value="2592000000">Months (appx.)</option>
 	<option value="31536000000">Years</option>
 </select>
+</span> <!-- the span that is changed when time ranges are changed-->
 <input type = "button" value = "Load/Refresh" id="refresh">
-
+<input type = "button" value = "Help" id = "help"> 
 <br>
 
 <div id="status" style="float: left; width: 30%; height: 100%">
@@ -64,17 +69,57 @@ Average Over:
 </div>
 </div>
 
+<div id="dialog" title="Help">
+<b>What Is PUE?</b> <br>
+<a href = "http://en.wikipedia.org/wiki/Power_usage_effectiveness">Wikipedia</a>: PUE is a measure of how efficiently a computer data center uses its power; specifically, how much of the power is actually used by the computing equipment (in contrast to cooling and other overhead).
+<br>
+<br>
+<b>How is PUE Calculated?</b>
+<br>
+<br><img src = "http://upload.wikimedia.org/wikipedia/en/math/2/5/b/25b96f4337f29c3aedf1fe7131ddcb66.png"> (from Wikipedia)
+<br>
+<br>
+<b>What resolutions of data are available?</b> <br>
+Raw - A point roughly every 20 seconds <br>
+300 - A point every 5 minutes<br>
+3600 - A point every hour<br>
+<br>
+<b>How are resolutions selected?</b>
+<br> For periods less than or equal to one day, raw data is used.
+<br> For periods between one day and one week, the 300 substreams are used.
+<br> For periods greater than one week, the 3600 substreams are used.
+<br>
+<br>
+<b>What is "Average Over"?</b>
+<br> "Average Over" allows you to select the smallest unit of data that is displayed. It automatically adjusts according to the feed that is being used.
+<br>
+<br>
+<b>Why is there no PUE output?</b>
+<br> PUE output may not be produced when there is a mismatch in the amount of data available from streams. In this case, please select an "Average Over" period large enough to compensate, or revise your time range selection.
+</div>
 
 <script type="text/javascript">
 
 var datacenters = [];
 //datacenters should be of the format, datacenters[<RoomNumInQuotes>] = [CoolingUnit, CoolingUnit, PDU]; or [CoolingUnit, PDU]; 
 datacenters["165Cory"] = ["73a95168-646e-5fa3-8bb1-402938158277","5b78547e-8b82-50a7-858e-d33a2378c742","eb54067c-4a90-58e0-9226-dba32d5d62b5"];
+datacenters["165Cory_sub30"] = ["e108be5b-9302-50de-8bcb-2ce9a3a81cb1","9bb59f1d-0a9b-5c99-b283-14858c7d8a65","e91afd8a-798a-573d-b4a5-b38a4a62b069"];
+datacenters["165Cory_sub36"] = ["23af45e5-4c86-5d19-a1ae-fa3fe1aa81d5","7c0a9525-47b4-58d8-82cf-526b89c8a8ef","0219d63e-19c7-585e-bf44-4a0147fa7004"];
 datacenters["420Soda"] = ["e0ca5c25-09a1-51e6-9dca-03262243cb48","f06b6a1f-ed13-520f-9109-59281e206a28","fbdf45b0-499a-578d-80e0-c94f50ce75af"]; 
+datacenters["420Soda_sub30"] = ["f6d86180-02e2-5552-9706-71b988ea79d1","cdff45aa-4937-5536-8d01-12561e77de02","10678c3a-e8e9-58d8-abb6-6a9b03c2d095"];
+datacenters["420Soda_sub36"] = ["23316784-707c-5fa2-af48-158d7fd232a5","b5b7f822-3c80-5c25-8b28-60357cfee444","a1620d4b-5356-556d-9255-66b1a9b89176"];
 datacenters["340Soda"] = ["8a8ce93d-35bf-53df-92f0-d5467bd5c779","0c355e60-5a65-5164-a63e-e4f3b263aadc","1a019f41-dd39-563d-9857-49a28e38385c"];
+datacenters["340Soda_sub30"] = ["5359f81b-4c4d-5fe2-a20f-4e032f066356","68f46945-ce3a-574a-98bf-c35d9e196516","0facef71-221c-532c-8224-b4e360979112"];
+datacenters["340Soda_sub36"] = ["330c01ac-91da-5611-bf6f-706749c9397a","12538306-f56b-5a75-81d6-e5bb05edf46c","5d151d64-3508-59f9-8edd-e68170e0ea18"];
 datacenters["290Soda"] = ["9823fe2e-b4d3-5968-8c82-8db9f9d456e3","81cf28e7-646b-5c61-a2dd-cb5e99d32e59","c7b53d42-a1a1-5ac0-9a42-e6f6dfa1105c"]; 
-datacenters["288Soda"] = ["5f4f9a1e-6019-588c-989e-e6787cc83ae0","0ef84a93-ad79-5b8a-a540-49c0860f5c61"];					 
+datacenters["290Soda_sub30"] = ["414d987d-7eda-52e0-9942-e1542b0a2841","7ddf7041-f67a-5444-b84d-d08f605ba86f","25c73725-255e-5126-a67e-4f4469178ca1"];
+datacenters["290Soda_sub36"] = ["4ec6e2bb-d0b9-505d-845f-72c69e36ca64","633dbf28-75a9-52f7-95b7-b96d93aa4610","0b820fe1-fbf9-51f8-a3ac-9b64eee600c0"];
+datacenters["288Soda"] = ["5f4f9a1e-6019-588c-989e-e6787cc83ae0","0ef84a93-ad79-5b8a-a540-49c0860f5c61"];		
+datacenters["288Soda_sub30"] = ["cbfdf13b-1fb3-588a-b01f-cb4097c7e559","923e0bfa-508d-5a25-8350-88261e5879e7"];
+datacenters["288Soda_sub36"] = ["f5ac6f4c-955c-5842-9b53-c07dd5e0c7f4","68d0a564-f573-57ce-8ebe-daf424cf17be"];
 datacenters["287Soda"] = ["9caa2b81-a75c-594e-9b61-d25254725e47","e5f220f0-56fa-50ba-a7d8-ff6ed20c3ed6","833a4cd9-c57e-55c1-a40b-75ad7036980d"];
+datacenters["287Soda_sub30"] = ["2d1446e2-5f82-5b2c-a653-c8d3f6f174e1","339b852a-b479-54ed-bee7-768a69eac517","3b21f56b-9dfe-5ed3-83d8-7d748e41ebed"];
+datacenters["287Soda_sub36"] = ["77ab2773-878e-5341-a5cb-57a3ea35c80a","879b9ba0-3044-531b-b693-56e2bb556443","2e9ecbe9-8d11-5589-b9c6-dabbb90fbd14"];
 var dcent_uuids = datacenters[$("#dcenter").val()];
 var saveddata = [];
 var avgbucketSize = 1000;
@@ -83,34 +128,67 @@ var converter = new AnyTime.Converter( { format: datefmt });
 var nowDate = new Date();
 $("#date").val(converter.format(nowDate));
 var startDate = new Date();
-startDate.setTime(nowDate - 200000);
+startDate.setTime(nowDate - 21600000);
 $("#date2").val(converter.format(startDate));
 
 AnyTime.picker( "date", { format: datefmt, firstDOW: 0 } );
 
 AnyTime.picker( "date2", { format: datefmt, firstDOW: 0 } );
 
+
+$(document).ready(function() {
+    $("#dialog").dialog({ autoOpen: false, minWidth: 800 });
+  });
+
 $("#refresh").click(function() {
 	saveddata = []; //resets saved data to prevent mismatched data
-	updateDisp()
-});
-
-$("#timeranges").change(function() {
 	avgbucketSize = $("#timeranges").val();
+	var converter = new AnyTime.Converter( { format: datefmt });
+	var endtime = converter.parse($("#date").val()).getTime();
+	var starttime = converter.parse($("#date2").val()).getTime();
+	///add ifs here to pull correct 
+	var uuidappendstring = "";
+	if ((endtime - starttime) > 86400000 && (endtime - starttime) < 604800000){
+		uuidappendstring = "_sub30";
+	}
+	if ((endtime - starttime) >= 604800000){
+		uuidappendstring = "_sub36";
+	}
+	dcent_uuids = datacenters[$("#dcenter").val() + uuidappendstring]; //USE SUBSTREAMS TO DEAL WITH LARGER TIME RANGES
+	updateDisp(endtime, starttime)
 });
 
-$("#dcenter").change(function() {
-	dcent_uuids = datacenters[$("#dcenter").val()];
+$("#date").change(function() {
+	rangeBoxUpdate();
+});
+$("#date2").change(function() {
+	rangeBoxUpdate();
 });
 
+function rangeBoxUpdate(){
+	var converter = new AnyTime.Converter( { format: datefmt });
+	var endtime = converter.parse($("#date").val()).getTime();
+	var starttime = converter.parse($("#date2").val()).getTime();
+	if ((endtime - starttime) <= 86400000){
+		var elt2 = $("<select id=\"timeranges\"> \n <option value=\"1000\">Seconds (raw data)</option> \n <option value=\"60000\">Minutes</option> \n <option value=\"3600000\">Hours</option> \n<option value=\"86400000\">Days</option> \n <option value=\"2592000000\">Months (appx.)</option> \n <option value=\"31536000000\">Years</option> \n </select>"); 
+	}
+	if ((endtime - starttime) > 86400000 && (endtime - starttime) < 604800000){
+		var elt2 = $("<select id=\"timeranges\"> \n <option value=\"60000\">Minutes</option> \n <option value=\"3600000\">Hours</option> \n<option value=\"86400000\">Days</option> \n <option value=\"2592000000\">Months (appx.)</option> \n <option value=\"31536000000\">Years</option> \n </select>"); 
+	}
+	if ((endtime - starttime) >= 604800000){
+		var elt2 = $("<select id=\"timeranges\"> \n <option value=\"3600000\">Hours</option> \n<option value=\"86400000\">Days</option> \n <option value=\"2592000000\">Months (appx.)</option> \n <option value=\"31536000000\">Years</option> \n </select>"); 
+	}      
+	$("#ranges").empty();
+	$("#ranges").append(elt2);
+}
 
+
+$("#help").click(function(){
+	$("#dialog").dialog("open");
+});
 //#####################################################################################
-//     Changelog:
-//		Fixed Feeds
-//		Fixed time display / modded to fit smaller screens
 //     ToDO:
-//              Better system for longer periods of time - select one day per month or something similar to compute average for a month
-//		Add Flot for graphing
+//		Add Flot for graphing, Improve UI
 //#####################################################################################
 
 Object.customlen = function custlen(dictionaryLikeObject){
@@ -164,7 +242,6 @@ function buildAverages(inputdata, endtime, starttime){
 		}
 		averaged[currentUUID] = thisUUIDoutput;
 	}
-	console.log(averaged);
 	return averaged;
 }
 
@@ -210,17 +287,13 @@ function dispOut(saveddata){
 }
 
 
-function updateDisp(){
-	var converter = new AnyTime.Converter( { format: datefmt });
-	var endtime = converter.parse($("#date").val()).getTime();
-	var starttime = converter.parse($("#date2").val()).getTime();
+function updateDisp(endtime, starttime){
 	var ctrl = getBusyOverlay(document.getElementById("status")); //a single busy overlay for the first status column, to indicate no data
 	for (var uuid_curr = 0; uuid_curr < dcent_uuids.length; uuid_curr++){
 		$.ajax({ //switched to ajax because it allows asynchronous loading to be turned off
 			async: false,
 			type: 'GET',
 			url: "/backend/api/data/uuid/" + escape(dcent_uuids[uuid_curr]) + "?starttime=" + escape(starttime) + "&endtime=" + escape(endtime),
-			//update this url to /backend/api/data/uuid/ +therest for production
 			success: function(resp) {
 				latest = [];
 				latest = eval(resp);
