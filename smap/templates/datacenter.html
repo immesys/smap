@@ -359,9 +359,10 @@ function updateDisp(endtime, starttime, graph){
 }
 
 function graphPUE(endtime, starttime, calcdPUE){
+	//fyi calcdPUE contains data in reverse order
 	passtoflot = [];
 	for (x = 0; x<calcdPUE.length; x++){
-		passtoflot.push([x, calcdPUE[x]]);
+		passtoflot.push([x, calcdPUE[calcdPUE.length-(x+1)]]);
 	}
 	$.plot($("#placeholder"), [ passtoflot ]);
 }
