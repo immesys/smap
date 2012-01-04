@@ -38,5 +38,10 @@ $(OUTFILE): $(PLOTJSMIN)
 %.min.out.js: %.js
 	$(JSMIN) $< > $@
 
-clean:
-	rm $(PLOTJSMIN) $(DEV_INCLUDE) $(PROD_INCLUDE)
+clean: clean-includes clean-minify
+
+clean-includes:
+	rm -f $(DEV_INCLUDE) $(PROD_INCLUDE)
+
+clean-minify:
+	rm $(PLOTJSMIN)	$(OUTFILE)
