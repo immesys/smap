@@ -448,6 +448,7 @@ function updatePlot() {
            "yaxes" : [ {}, {
                "position" : "right"
              }],
+            grid: { hoverable: true },
             lines: {
               fill: document.getElementById("stack").checked,
                lineWidth: 1,
@@ -474,6 +475,10 @@ function updatePlot() {
 //         e.preventDefault();
 //         plot.zoomIn();
 //     });
+
+  // show series values on hover.
+  console.log("Binding");
+  $("#chart_div").bind("plothover", displayPointValues);
 }
 
 
@@ -537,3 +542,38 @@ function autoUpdatePoll() {
   }
 }
 setTimeout(autoUpdatePoll, 1000);
+
+var previousPoint = null;
+var previousRender = 0;
+
+function showTooltip(x, y, contents) {
+  $('<div id="tooltip">' + contents + '</div>').css( {
+      position: 'absolute',
+        display: 'none',
+        top: y + 5,
+        left: x + 5,
+        border: '1px solid #fdd',
+        padding: '2px',
+        'background-color': '#fee',
+        opacity: 0.80
+        }).appendTo("body").fadeIn(200);
+}
+
+function displayPointValues(event, pos, item) {
+  now = new Date().getTime()
+  if (previousPoint != item.dataIndex &&
+      now - previousRender > 50) {
+      previousPoint = item.dataIndex;
+      previousRender = now;
+                    
+    $("#tooltip").remove();
+    var x = item.datapoint[0].toFixed(2),
+      y = item.datapoint[1].toFixed(2);
+    var point = new timezoneJS.Date();
+    // we've already munged the timestamps...
+    point.setTimezone("Etc/UTC");
+    point.setTime(item.datapoint[0]);
+    showTooltip(item.pageX, item.pageY,
+                point.toString() + ": " + y);
+  }
+}
