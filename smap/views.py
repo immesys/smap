@@ -83,5 +83,11 @@ def plot(request, tree=2):
     else:
         c = Context({'default_tree_id' : str(tree)})
 
+    print request.GET
+    if not 'dev' in request.GET:
+        c['includeheaders'] = 'templates/includes.html'
+    else:
+        c['includeheaders'] = 'templates/includes-dev.html'
+
     t = loader.get_template('templates/plot.html')
     return HttpResponse(t.render(c))

@@ -191,3 +191,10 @@ h2 {
  color: black;
  font-style: italic;
 }
+
+#chart_controls {
+ width: 100%;
+ clear: left;
+ padding-left: 30px;
+ font-size: smaller;
+}

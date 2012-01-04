@@ -13,6 +13,7 @@ var pending_loads = 0;
 var last_render = 0;
 
 var plot_data = {};
+var current_zoom = {};
 
 function plotInit (no_create) {
   // set up a reasonable range by default
@@ -36,6 +37,8 @@ function plotInit (no_create) {
   if ("stack" in page_args) {
     document.getElementById("stack").checked = !(page_args["stack"] == "false");
   }
+
+  makeChartControls();
 }
 
 
@@ -356,6 +359,7 @@ function updateLegend() {
     div.append(makeSubstreamTable(streamid));
     div.append(makeTagTable(tags));
     div.append("<div style=\"clear: left; margin: 12px;\"></div>");
+
     $("#description").append(div);
 
     $("#axis_" + streamid).buttonset();
@@ -413,7 +417,15 @@ function updateAxisLabels() {
   document.getElementById("yaxis2Label").innerHTML = $.unique(yunits[1]).join(", ");
 }
 
-function updatePlot() {
+function makeChartControls() {
+  $("#chart_controls").empty();
+  $("#chart_controls").append('<input type="checkbox" id="stack" onchange="javascript: setTimeout(updatePlot, 0)">Stack</input>');
+  $("#chart_controls").append('<input type="checkbox" id="autoupdate" onchange="javascript: null;">Autoupdate</input>');
+  $("#chart_controls").append('<input name="select_mode" type="radio" value="zoom" onchange="javascript: updatePlot(true)" checked>Zoom' +
+                              '  <input name="select_mode" type="radio" value="hover" onchange="javascript: updatePlot(true)">Hover');
+}
+
+function updatePlot(maintain_zoom) {
   var ddata = [];
   var now = (new Date()).getTime();
   if (pending_loads > 0 && 
@@ -449,8 +461,6 @@ function updatePlot() {
     yaxes : [ {}, {
         position : "right"
       }],
-    selection : { mode: "x" , color: $.color.parse("#A8A8A8") },
-    //grid: { hoverable: true },
     lines: {
       fill: document.getElementById("stack").checked,
       lineWidth: 1,
@@ -458,48 +468,58 @@ function updatePlot() {
     // use matlab's colormap(lines)
     colors: colormap,
   };
+  var interact_mode = $("input:radio[name=select_mode]:checked").val();
+  if (interact_mode == "zoom") {
+    plot_options["selection"] = { mode: "x" , color: $.color.parse("#A8A8A8") }
+  } else {
+    plot_options["grid"] = { hoverable: true };
+  }
+
+  // reset the zoom window
+  if (!(maintain_zoom === true)) {
+    current_zoom = {}
+  }
 
   var plot = $.plot($("#chart_div"), 
-                    ddata, plot_options);
+                    ddata, 
+                    $.extend(true, {}, plot_options, current_zoom));
 
-  // show series values on hover.
-  $("#chart_div").bind("plothover", function (event, pos, item) {
-      now = new Date().getTime();
-      if (previousPoint != item.dataIndex &&
-          now - previousRender > 50 &&
-          drawToolTip) {
-        previousPoint = item.dataIndex;
-        previousRender = now;
+  $("#tooltip").remove();
+  if (interact_mode == "hover") {
+    // show series values on hover.
+    $("#chart_div").bind("plothover", function (event, pos, item) {
+        now = new Date().getTime();
+        if (item &&
+            previousPoint != item.dataIndex &&
+            now - previousRender > 50) {
+          previousPoint = item.dataIndex;
+          previousRender = now;
         
-        $("#tooltip").remove();
-        var x = item.datapoint[0].toFixed(2),
-          y = item.datapoint[1].toFixed(2);
-        var point = new timezoneJS.Date();
-        // we've already munged the timestamps...
-        point.setTimezone("Etc/UTC");
-        point.setTime(item.datapoint[0]);
-        showTooltip(item.pageX, item.pageY,
-                    point.toString() + ": " + y);
-      }
-    });
-  $("#chart_div").bind("plotselecting", function () {
-      $("#tooltip").remove();
-      drawToolTip = false;
-    });
-  $("#chart_div").bind("plotselected", function (event, ranges) {
-      drawToolTip = true;
-      console.log("plotting");
-      plot = $.plot("#chart_div", ddata,
-                    $.extend(true, {}, plot_options, {
-                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
-                      }));
-    });
+          $("#tooltip").remove();
+          var x = item.datapoint[0].toFixed(2),
+            y = item.datapoint[1].toFixed(2);
+          var point = new timezoneJS.Date();
+          // we've already munged the timestamps...
+          point.setTimezone("Etc/UTC");
+          point.setTime(item.datapoint[0]);
+          showTooltip(item.pageX, item.pageY,
+                      point.toString() + ": " + y);
+        }
+      });
+  } else if (interact_mode == "zoom") {
+    // selection is enabled, change the x range when zoomed.
+    $("#chart_div").bind("plotselected", function (event, ranges) {
+        current_zoom = { xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to } };
+        plot = $.plot("#chart_div", ddata,
+                      $.extend(true, {}, plot_options, current_zoom));
+      });
+  }
   $("#chart_div").bind("dblclick", function (event) {
-      drawToolTip = true;
+      // unset the zoom window
+      current_zoom = {};
       plot = $.plot($("#chart_div"), ddata, plot_options);
     });
 }
-
 
 function setEndNow() {
   var converter = new AnyTime.Converter( { format: datefmt });
