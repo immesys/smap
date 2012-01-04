@@ -439,46 +439,65 @@ function updatePlot() {
   }
 
   updateAxisLabels();
-  var plot = $.plot($("#chart_div"), 
-         ddata,
-         {
-           "xaxes" : [{
-             "mode" : "time",
-            }],
-           "yaxes" : [ {}, {
-               "position" : "right"
-             }],
-            grid: { hoverable: true },
-            lines: {
-              fill: document.getElementById("stack").checked,
-               lineWidth: 1,
-            },
-            // use matlab's colormap(lines)
-            colors: colormap,
-//             zoom : {
-//              interactive: false,
-//             },
-//             pan : {
-//              interactive: false,
-//             },
-//             selection : {
-//               mode: "xy"
-//             },
-         });
+  var previousPoint = null;
+  var previousRender = 0;
+  var drawToolTip = true;
+  var plot_options = {
+    xaxes : [{
+        mode : "time",
+      }],
+    yaxes : [ {}, {
+        position : "right"
+      }],
+    selection : { mode: "x" , color: $.color.parse("#A8A8A8") },
+    //grid: { hoverable: true },
+    lines: {
+      fill: document.getElementById("stack").checked,
+      lineWidth: 1,
+    },
+    // use matlab's colormap(lines)
+    colors: colormap,
+  };
 
-    // add zoom out button
-//    $('<div class="zoomout">zoom out</div>').appendTo($("#chart_div")).click(function (e) {
-//         e.preventDefault();
-//         plot.zoomOut();
-//     });
-//    $('<div class="zoomout">zoom in</div>').appendTo($("#chart_div")).click(function (e) {
-//         e.preventDefault();
-//         plot.zoomIn();
-//     });
+  var plot = $.plot($("#chart_div"), 
+                    ddata, plot_options);
 
   // show series values on hover.
-  console.log("Binding");
-  $("#chart_div").bind("plothover", displayPointValues);
+  $("#chart_div").bind("plothover", function (event, pos, item) {
+      now = new Date().getTime();
+      if (previousPoint != item.dataIndex &&
+          now - previousRender > 50 &&
+          drawToolTip) {
+        previousPoint = item.dataIndex;
+        previousRender = now;
+        
+        $("#tooltip").remove();
+        var x = item.datapoint[0].toFixed(2),
+          y = item.datapoint[1].toFixed(2);
+        var point = new timezoneJS.Date();
+        // we've already munged the timestamps...
+        point.setTimezone("Etc/UTC");
+        point.setTime(item.datapoint[0]);
+        showTooltip(item.pageX, item.pageY,
+                    point.toString() + ": " + y);
+      }
+    });
+  $("#chart_div").bind("plotselecting", function () {
+      $("#tooltip").remove();
+      drawToolTip = false;
+    });
+  $("#chart_div").bind("plotselected", function (event, ranges) {
+      drawToolTip = true;
+      console.log("plotting");
+      plot = $.plot("#chart_div", ddata,
+                    $.extend(true, {}, plot_options, {
+                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                      }));
+    });
+  $("#chart_div").bind("dblclick", function (event) {
+      drawToolTip = true;
+      plot = $.plot($("#chart_div"), ddata, plot_options);
+    });
 }
 
 
@@ -543,8 +562,6 @@ function autoUpdatePoll() {
 }
 setTimeout(autoUpdatePoll, 1000);
 
-var previousPoint = null;
-var previousRender = 0;
 
 function showTooltip(x, y, contents) {
   $('<div id="tooltip">' + contents + '</div>').css( {
@@ -559,21 +576,3 @@ function showTooltip(x, y, contents) {
         }).appendTo("body").fadeIn(200);
 }
 
-function displayPointValues(event, pos, item) {
-  now = new Date().getTime()
-  if (previousPoint != item.dataIndex &&
-      now - previousRender > 50) {
-      previousPoint = item.dataIndex;
-      previousRender = now;
-                    
-    $("#tooltip").remove();
-    var x = item.datapoint[0].toFixed(2),
-      y = item.datapoint[1].toFixed(2);
-    var point = new timezoneJS.Date();
-    // we've already munged the timestamps...
-    point.setTimezone("Etc/UTC");
-    point.setTime(item.datapoint[0]);
-    showTooltip(item.pageX, item.pageY,
-                point.toString() + ": " + y);
-  }
-}
