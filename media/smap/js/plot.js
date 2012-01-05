@@ -34,11 +34,11 @@ function plotInit (no_create) {
     { format: datefmt, firstDOW: 0 } );  
   }
 
+  makeChartControls();
+
   if ("stack" in page_args) {
     document.getElementById("stack").checked = !(page_args["stack"] == "false");
   }
-
-  makeChartControls();
 }
 
 
@@ -295,6 +295,7 @@ function makeAxisFn(eltid) {
   return function() {
     plot_data[eltid]["yaxis"] = 
       $("input:radio[name=axis_" + eltid + "]:checked").val();
+    updatePlot();
   }
 }
 
@@ -388,7 +389,8 @@ function updateLegend() {
   document.getElementById("permalink").href = 
     "/plot/" + "?streamids=" + sArray.join(',') + 
     "&start=" + start + "&end=" + end +
-    "&stack=" + document.getElementById("stack").checked;
+    "&stack=" + document.getElementById("stack").checked + 
+    "&tree=" + treeidx;
 }
 
 function updateAxisLabels() {

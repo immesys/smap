@@ -11,7 +11,7 @@ function tag_escape(x){
 function treeOpenPath(path) {
   if (path.length) {
     var thisseg = unescape(path.shift());
-    $("#tree_div").jstree("open_node", $("#tree_div a:contains('" + thisseg + "') :parent"), 
+    $("#tree_div").jstree("open_node", $("#tree_div a:containsexactly('\xA0" + thisseg + "') :parent"), 
                           function () { treeOpenPath(path); });
   }
 }
@@ -131,7 +131,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
            console.log(query + clauses);
 
            $.post(backend + "/api/query?" + private_flags, query + clauses,
-                 function (resp) {
+                  function (resp) {
                    var obj = eval(resp);
                    seriesLabel = undefined;
                    if ($.type(tree_order[p.length - 1]) == "object" &&
@@ -140,7 +140,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
                    }
                    // trigger the select callback with the uuid
                    selectcb(p, obj, seriesLabel);
-                 });
+                 }, "text");
            
          });
        last_selected = new_selection;

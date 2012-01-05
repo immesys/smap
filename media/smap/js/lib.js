@@ -50,3 +50,9 @@ function flatten(obj, includePrototype, into, prefix) {
 
     return into;
 }
+
+// add a ":containsexactly" jquery selector
+$.expr[':'].containsexactly = function(obj, index, meta, stack) 
+{  
+  return $(obj).text() === meta[3];
+}; 

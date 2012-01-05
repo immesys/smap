@@ -23,6 +23,8 @@ urlpatterns = patterns('',
     (r'^backend/', include('powerdb2.backend.urls')),
     (r'^backend_auth/', include('powerdb2.backend.urls')),
 
+    (r'^backend_auth/', include('powerdb2.backend.urls')),
+
                        # (r'^api/', include('powerdb2.api.urls')),
 
     (r'^datacenter/', include('powerdb2.datacenter.urls')),
