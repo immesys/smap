@@ -159,18 +159,23 @@ function makeTagTable(obj) {
 }
 
 // add a stream to the current plot
-function addStream(streamid, labels, hidden) {
+function addStreams(tags, labels, n) {
   for (var i = 0; i < labels.length; i++) { 
     labels[i] = labels[i].replace(/__/g, "/"); 
   }
-  plot_data[streamid] = {
-    "data" : [],
-    "seriesLabel" : labels,
-    "yaxis" : -1,
-    "hidden" : hidden == undefined ? false : hidden,
-    "data_loaded" : false,
-  };
-  updateMeta(streamid);
+  for (var i = 0; i < tags.length; i++) {
+    var streamid = tags[i]["uuid"]
+    plot_data[streamid] = {
+      "data" : [],
+      "seriesLabel" : labels,
+      "yaxis" : -1,
+      "hidden" : (i >= n),
+      "data_loaded" : false,
+      "tags" : tags[i],
+      "label" : streamid,
+    };
+    if (i < n) updateMeta(streamid);
+  }
 }
 
 function delStream(streamid) {
@@ -210,30 +215,13 @@ function chooseAxis(streamid) {
 
 // load the metadata for streamid "streamid" and plot
 function updateMeta(streamid) {
-  plot_data[streamid]['load_count'] = 2;
-  $.get(backend + "/api/tags/uuid/" + streamid + "?" + private_flags,
-        function(data) {
-          var obj = eval(data)[0];
-          plot_data[streamid]['tags'] = obj;
-          plot_data[streamid]['label'] = obj['uuid'];          
-          if (plot_data[streamid]["yaxis"] == -1)
-            chooseAxis(streamid);
-
-           if (!(--plot_data[streamid]['load_count'])) {
-             loadData(streamid);
-           }
-        });
-
   // load any substreams too so we can create them in the gui
   $.post(backend + "/api/query?" + private_flags,
          "select * where Metadata/Extra/SourceStream = '" + streamid + "'",
          function (data) {
            plot_data[streamid]["substreams"] = data;
-
-           if (!(--plot_data[streamid]['load_count'])) {
-             loadData(streamid);
-           }
-
+           chooseAxis(streamid);
+           loadData(streamid);
          }, "json");
 }
 
@@ -380,7 +368,8 @@ function updateLegend() {
                                                  "Show" : "Hide"});
         if (!plot_data[streamid_]["hidden"] && 
             !plot_data[streamid_]["data_loaded"]) {
-          loadData(streamid_);
+          // loadData(streamid_);
+          updateMeta(streamid_);
         } else {
           updatePlot();
         }
@@ -406,6 +395,8 @@ function updateAxisLabels() {
   var xunits = [];
   var yunits = [[], []];
   for (var streamid in plot_data) {
+    if (!plot_data[streamid]["data_loaded"] || 
+        plot_data[streamid]["hidden"]) continue;
     xunits.push(plot_data[streamid]['tags']['Properties']['Timezone']);
     yunits[parseInt(plot_data[streamid]['yaxis']) - 1]
       .push(plot_data[streamid]['tags']['Properties']['UnitofMeasure']);

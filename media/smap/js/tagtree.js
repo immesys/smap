@@ -110,11 +110,11 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
          });
 
        $(new_selection).each(
-         // look up the uuid for each newly selected stream.
+         // look up the tags for each newly selected stream.
          function () {
            var p = this[0];
            var node = this[1];
-           var query = 'select distinct uuid ';
+           var query = 'select * ';
 
            for (var i = 0; i < last_selected.length; i++) {
              if (this.toString() == last_selected[i].toString()) {
