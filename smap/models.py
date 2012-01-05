@@ -40,15 +40,15 @@ class Subscription(models.Model):
 
 class Stream(models.Model):
     id = models.AutoField(primary_key=True)
-    subscription = models.ForeignKey(Subscription)
+    subscription = models.ForeignKey(Subscription, db_index=True)
     uuid = models.CharField(unique=True, max_length=36)
     class Meta:
         db_table = u'stream'
 
 class Metadata2(models.Model):
     id = models.AutoField(primary_key=True)
-    stream = models.ForeignKey(Stream)
-    tagname = models.CharField(max_length=64)
+    stream = models.ForeignKey(Stream, db_index=True)
+    tagname = models.CharField(max_length=64, db_index=True)
     tagval = models.TextField()
     class Meta:
         db_table = u'metadata2'

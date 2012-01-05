@@ -23,13 +23,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'smapdb'
-# DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-# DATABASE_NAME = 'powerdb2'             # Or path to database file if using sqlite3.
-# DATABASE_USER = 'powerdb2'             # Not used with sqlite3.
-# DATABASE_PASSWORD = 'RuEHerKCXT6h'         # Not used with sqlite3.
-# DATABASE_HOST = 'www.openbms.org'             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'archiver'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'archiver'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'password'         # Not used with sqlite3.
+DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
 # DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 # DATABASE_OPTIONS = {
 #    "init_command": "SET storage_engine=INNODB",
@@ -39,7 +37,8 @@ DATABASE_NAME = 'smapdb'
 # time-series data, and tags.  The Berkeley ARD runs at the location
 # below; you can use it if you have an API key; even without it, you
 # can query public streams.
-ARD_URL = 'http://smote.cs.berkeley.edu:8079'
+# ARD_URL = 'http://smote.cs.berkeley.edu:8079'
+ARD_URL = 'http://localhost:8079'
 
 # if you have an API key, put it here.  this will allow you to access
 # streams whose data is associated with your key in the backend and
