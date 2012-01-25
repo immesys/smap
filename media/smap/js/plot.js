@@ -201,11 +201,12 @@ function chooseAxis(streamid) {
       continue;
     if (!("tags" in plot_data[sid]))
       continue;
-    y1used = true;
-
+    
     if (plot_data[streamid]["tags"]["Properties"]["UnitofMeasure"] ==
         plot_data[sid]["tags"]["Properties"]["UnitofMeasure"]) {
       plot_data[streamid]["yaxis"] = plot_data[sid]["yaxis"];
+    } else {
+      y1used = true;
     }
   }
   if (plot_data[streamid]["yaxis"] == -1) {
