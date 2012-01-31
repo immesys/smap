@@ -159,7 +159,7 @@ function makeTagTable(obj) {
 }
 
 // add a stream to the current plot
-function addStreams(tags, labels, n) {
+function addStreams(tags, labels, n, yaxis) {
   for (var i = 0; i < labels.length; i++) { 
     labels[i] = labels[i].replace(/__/g, "/"); 
   }
@@ -168,12 +168,13 @@ function addStreams(tags, labels, n) {
     plot_data[streamid] = {
       "data" : [],
       "seriesLabel" : labels,
-      "yaxis" : -1,
+      "yaxis" : (yaxis === undefined) ? -1 : yaxis,
       "hidden" : (i >= n),
       "data_loaded" : false,
       "tags" : tags[i],
       "label" : streamid,
     };
+    console.log("addStreams " + streamid + " " + plot_data[streamid]["yaxis"]);
     if (i < n) updateMeta(streamid);
   }
 }
@@ -194,6 +195,12 @@ function plotterClearPlot() {
 
 function chooseAxis(streamid) {
   var y1used = false;
+  // console.log("choose axis " + streamid + " " +   plot_data[streamid]["yaxis"]);
+
+  if (!(plot_data[streamid]["yaxis"] === undefined ||
+      plot_data[streamid]["yaxis"] == -1)) {
+    return;
+  }
   plot_data[streamid]["yaxis"] = -1;
 
   for (sid in plot_data) {
@@ -205,13 +212,32 @@ function chooseAxis(streamid) {
     if (plot_data[streamid]["tags"]["Properties"]["UnitofMeasure"] ==
         plot_data[sid]["tags"]["Properties"]["UnitofMeasure"]) {
       plot_data[streamid]["yaxis"] = plot_data[sid]["yaxis"];
-    } else {
+    } else if (plot_data[sid]["yaxis"] != -1) {
       y1used = true;
     }
+    // console.log(plot_data[sid]["yaxis"]);
   }
   if (plot_data[streamid]["yaxis"] == -1) {
     plot_data[streamid]["yaxis"] = (y1used) ? 2 : 1;
   }
+}
+
+function updatePermalink() {
+  var range = getTimeRange();
+  var start = range[0], end = range[1];
+  var sArray = [], aArray = [];
+  var dev = ("dev" in page_args) ? "&dev=" : "";
+  for (var streamid in plot_data) {
+    sArray.push(streamid);
+    aArray.push(plot_data[streamid]["yaxis"]);
+  }
+  document.getElementById("permalink").href = 
+    "/plot/" + "?streamids=" + sArray.join(',') + 
+    "&start=" + start + "&end=" + end +
+    "&stack=" + document.getElementById("stack").checked + 
+    "&tree=" + treeidx +
+    "&axes=" + aArray.join(",") + 
+    dev;
 }
 
 // load the metadata for streamid "streamid" and plot
@@ -315,10 +341,8 @@ function updateLegend() {
   $("#description").empty();
   var range = getTimeRange();
   var start = range[0], end = range[1];
-  var sArray = [];
   var i = 0;
   for (var streamid in plot_data) {
-    sArray.push(streamid);
     if (!("tags" in plot_data[streamid])) continue;
     var div = $("<div class=\"legend_item\"></div>");
     var label_pieces = [];
@@ -387,11 +411,7 @@ function updateLegend() {
     
     $("#" + streamid).hide();
   }
-  document.getElementById("permalink").href = 
-    "/plot/" + "?streamids=" + sArray.join(',') + 
-    "&start=" + start + "&end=" + end +
-    "&stack=" + document.getElementById("stack").checked + 
-    "&tree=" + treeidx;
+  updatePermalink();
 }
 
 function updateAxisLabels() {
@@ -445,6 +465,7 @@ function updatePlot(maintain_zoom) {
   }
 
   updateAxisLabels();
+  updatePermalink();
   var previousPoint = null;
   var previousRender = 0;
   var drawToolTip = true;
