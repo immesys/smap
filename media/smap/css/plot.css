@@ -199,3 +199,8 @@ h2 {
  padding-left: 30px;
  font-size: smaller;
 }
+
+#__plot_selected {
+ margin-top: 5px;
+ width: 100%;
+}

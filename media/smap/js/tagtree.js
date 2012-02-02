@@ -11,7 +11,7 @@ function tag_escape(x){
 function treeOpenPath(path) {
   if (path.length) {
     var thisseg = unescape(path.shift());
-    $("#tree_div").jstree("open_node", $("#tree_div a:containsexactly('\xA0" + thisseg + "') :parent"), 
+    $("#__tree_div").jstree("open_node", $("#__tree_div a:containsexactly('\xA0" + thisseg + "') :parent"), 
                           function () { treeOpenPath(path); });
   }
 }
@@ -23,9 +23,9 @@ function treeOpenPath(path) {
 // selectcb: callback called with (path, [uuid list], label text)
 //   arguments when streams are selected in the tree
 // deselectcb: callback called with (uuid) when a stream is deselected
-function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
+function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
  $(function() {
-     var last_selected = [];
+     // var last_selected = [];
      var separator = '/';
 
      // get the tag name a particular tree level uses
@@ -86,9 +86,9 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
      function updateSelection() {
        var uuids = [];
        var new_selection = [];
-       $($(div).jstree("get_selected")).each(
+       $($("#__tree_div").jstree("get_selected")).each(
          function () {
-           var p = $(div).jstree("get_path", this);
+           var p = $("#__tree_div").jstree("get_path", this);
            // ignore non-leaves
            if (p.length < tree_order.length &&
                ($.type(tree_order[p.length - 1]) == "string" ||
@@ -97,17 +97,17 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
            new_selection.push([p, this]);
          });
 
-       $(last_selected).each(
-         function () {
-           for (var i = 0; i < new_selection.length; i++) {
-             if (this[0].toString() == new_selection[i][0].toString()) {
-               return;
-             }
-           }
-           // call deselctcb on all of the streams which are no longer
-           // selected
-           deselectcb(this[0]);
-         });
+       // $(last_selected).each(
+       //   function () {
+       //     for (var i = 0; i < new_selection.length; i++) {
+       //       if (this[0].toString() == new_selection[i][0].toString()) {
+       //         return;
+       //       }
+       //     }
+       //     // call deselctcb on all of the streams which are no longer
+       //     // selected
+       //     // deselectcb(this[0]);
+       //   });
 
        $(new_selection).each(
          // look up the tags for each newly selected stream.
@@ -116,11 +116,11 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
            var node = this[1];
            var query = 'select * ';
 
-           for (var i = 0; i < last_selected.length; i++) {
-             if (this.toString() == last_selected[i].toString()) {
-               return;
-             }
-           }
+           // for (var i = 0; i < last_selected.length; i++) {
+           //   if (this.toString() == last_selected[i].toString()) {
+           //     return;
+           //   }
+           // }
            var clauses = " where " + buildClauses(p, node);
            if ($.type(tree_order[p.length - 1]) == "object" &&
                "defaultSubStream" in tree_order[p.length - 1]) {
@@ -143,12 +143,23 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
                  }, "text");
            
          });
-       last_selected = new_selection;
+//       last_selected = new_selection;
      }
-     $(div)
+     $(div).append($("<input/>", {
+         type: "button",
+         value: "Plot selected",
+         id: "__plot_selected"}));
+     $(div).append($("<div/>", {
+         id: "__tree_div" }));
+     $("#__plot_selected").button();
+     $("#__plot_selected").click(function () {
+         clearcb(); updateSelection();
+     });
+
+     $("#__tree_div")
        .jstree(
          {
-           "plugins" : [ "themes", "json_data", "crrm", "ui", "ajax" ],
+           "plugins" : [ "themes", "json_data", "crrm", "ui", "ajax", "contextmenu"],
            "json_data" : {
              // dynamically open nodes by querying when they're opened and adding the
              // appropriate children
@@ -158,7 +169,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
                "data" : function (n) {
                  // load data for a tree level
                  // generate the query which is send as the POST payload
-                 var p = $(div).jstree("get_path", n);
+                 var p = $("#__tree_div").jstree("get_path", n);
                  var query = "select distinct ";
                  if (n == -1) {
                    p = [];
@@ -193,7 +204,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
                  // process the returned query data into a jstree struct
                  var obj = eval(resp);
                  var rv = [];
-                 var p = $(div).jstree("get_path", node);
+                 var p = $("#__tree_div").jstree("get_path", node);
                  p = (p == false) ? 0 : p.length;
                  if (p < tree_order.length - 1 || !isPrefixTree()) {
                    // write tree nodes for the non-prefix-tree portion of the tree
@@ -259,13 +270,33 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, openpath) {
            },
            "ui": {
              "select_multiple_modifier" : "shift",
+           },
+           "contextmenu": {
+             "items" : function (node) {
+                 return {
+                   "plot" : {
+                       "label" : "Plot",
+                       "action" : updateSelection,
+                   }
+                }
+             }
            }
          })
+       .bind("dblclick.jstree", function(event) {
+               var node = $(event.target).closest("li");
+               if ($(node).hasClass("jstree-leaf")) {
+                 $("#__tree_div").jstree("select_node", node);
+                 clearcb();
+                 updateSelection();
+               } else {
+                 $("#__tree_div").jstree("toggle_node", node);
+               }
+             })
        .bind("select_node.jstree", function(event, data) {
-               updateSelection();
+               // updateSelection();
              })
        .bind("deselect_node.jstree", function(event, data) {
-               updateSelection();
+               // updateSelection();
              })
        .bind("loaded.jstree", function() {
                treeOpenPath(openpath);
