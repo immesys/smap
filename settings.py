@@ -33,6 +33,8 @@ DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not
 #    "init_command": "SET storage_engine=INNODB",
 # }
 
+ADMIN_BACKEND = "http://localhost:8080/"
+
 # the ARchiver Daemon is a process which manages the archive of your
 # time-series data, and tags.  The Berkeley ARD runs at the location
 # below; you can use it if you have an API key; even without it, you
@@ -107,7 +109,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     # '/mnt/md1/django/powerdb/smap/',
-    os.path.join(PROJECT_ROOT, 'smap/'),
+    os.path.join(PROJECT_ROOT, 'templates/'),
     os.path.join(PROJECT_ROOT, 'campus/templates'),
 )
 
@@ -115,6 +117,7 @@ STATIC_DOC_ROOT = os.path.join(PROJECT_ROOT, 'media/')
 
 INSTALLED_APPS = (
     'powerdb2.smap',
+    'powerdb2.alert',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

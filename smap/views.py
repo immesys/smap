@@ -11,17 +11,6 @@ from django.db import connection
 from django.contrib.admin import site as adminsite
 # import django.contrib.auth.views as adminviews
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-try:
-    import cjson
-    cjson_encode = cjson.encode
-except ImportError:
-    print "WARN: cjson not found, using standard json"
-    cjson_encode = json.dumps
-
 # stuff for csv
 import cStringIO
 import csv
@@ -84,9 +73,9 @@ def plot(request, tree=2):
         c = Context({'default_tree_id' : str(tree)})
 
     if not 'dev' in request.GET:
-        c['includeheaders'] = 'templates/includes.html'
+        c['includeheaders'] = 'includes.html'
     else:
-        c['includeheaders'] = 'templates/includes-dev.html'
+        c['includeheaders'] = 'includes-dev.html'
 
-    t = loader.get_template('templates/plot.html')
+    t = loader.get_template('plot.html')
     return HttpResponse(t.render(c))

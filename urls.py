@@ -34,6 +34,8 @@ urlpatterns = patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root' : settings.STATIC_DOC_ROOT, 'show_indexes' : True}),
 
+    (r'^alert/', include('powerdb2.alert.urls')),
+
     (r'^$', 'powerdb2.views.root'),
  
     
