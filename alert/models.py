@@ -18,6 +18,8 @@ except NameError:
 from powerdb2 import settings
 from smap.archiver.client import SmapClient
 
+import emaillib
+
 comparators = {
     'LT' : operator.__lt__,
     'GT' : operator.__gt__,
@@ -82,7 +84,7 @@ class Action(models.Model):
     rate = models.IntegerField(default=60, help_text="""
 Number of seconds between checking the alert condition""")
 
-    # (optional) group to send alert to
+    # group to send alert to
     group = models.ForeignKey(Group, null=True, blank=True)
 
     alert_when_true = models.BooleanField(default=True)
@@ -130,10 +132,10 @@ Number of seconds between checking the alert condition""")
                 'alarm' : alert.__unicode__(),
                 })
         logentry.message = template.render(context)
-        # print logentry.message
         logentry.save()
-        
-    # self.save()
+
+        to = filter(None, map(operator.attrgetter('email'), self.group.user_set.all()))
+        emaillib.send(to, 'Alert from %s' % settings.ROOT_NETLOC, logentry.message)
             
 def get_default_action():
     poss = Action.objects.filter(name="Default")
@@ -214,3 +216,5 @@ def ping_backend(sender, instance, **kwargs):
             print "Error pong-ing backend:", e
 
 signals.post_save.connect(ping_backend, sender=Alert)
+
+    

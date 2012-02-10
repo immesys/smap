@@ -9,7 +9,7 @@ class TestAdmin(admin.ModelAdmin):
     pass
 
 class ActionAdmin(admin.ModelAdmin):
-    fields = ('name', 'template', 'rate', 'alert_when_true', 'alert_when_false')
+    fields = ('name', 'template', 'group', 'rate', 'alert_when_true', 'alert_when_false')
 
 class AlertAdmin(admin.ModelAdmin):
     list_display = ('description', '__unicode__', 'last_check', 'set', 'error_state')
@@ -50,6 +50,7 @@ class LevelAdmin(admin.ModelAdmin):
 
 class LogAdmin(admin.ModelAdmin):
     list_display = ('when', 'alert')
+    list_filter = ('alert__description',)
     fieldsets = (
         (None, {'fields': ('when', 'alert') }),
         ('Message', {'fields': ('message',)}),

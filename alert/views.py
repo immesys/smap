@@ -126,7 +126,7 @@ class LogHandler(BaseHandler):
 #         else:
 #             return Log.objects.
     
-def filter(request, id, test=True):
+def alert_filter(request, id, test=True):
     a = Alert.objects.get(id=int(id))
     return HttpResponse(simplejson.dumps([x for x in a.current() if x['Set'] == test]),
                         mimetype='application/json')

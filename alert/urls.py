@@ -11,6 +11,6 @@ urlpatterns = patterns('',
     url(r'^log/(?P<id>\d+)$', log_handler, {'emitter_format': 'json'}),
     url(r'^log/$', log_handler, {'emitter_format': 'json'}),
     url(r'^current/(?P<id>\d+)$', 'powerdb2.alert.views.current'),
-    url(r'^set/(?P<id>\d+)$', 'powerdb2.alert.views.filter', kwargs={'test':True}),
-    url(r'^clear/(?P<id>\d+)$', 'powerdb2.alert.views.filter', kwargs={'test':False}),
+    url(r'^set/(?P<id>\d+)$', 'powerdb2.alert.views.alert_filter', kwargs={'test':True}),
+    url(r'^clear/(?P<id>\d+)$', 'powerdb2.alert.views.alert_filter', kwargs={'test':False}),
     )
