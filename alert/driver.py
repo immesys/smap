@@ -24,7 +24,7 @@ class AlertDriver(driver.SmapDriver):
             # reload an alert on a set request
             d = threads.deferToThread(lambda: models.Alert.objects.filter(enabled=True,
                                                                           id=state))
-            d.addCallback(self.driver._check_alerts)
+            d.addCallback(self.driver._check_alerts, state)
             return state
 
     def setup(self, opts):
@@ -69,7 +69,7 @@ class AlertDriver(driver.SmapDriver):
         finished.addCallback(self._add_alert_error, id)
         return finished
 
-    def _check_alerts(self, alerts):
+    def _check_alerts(self, alerts, requested_id=None):
         """Check to make sure we are sync'ed up with the database
         about which alerts we should be computing"""
         for a in alerts:
@@ -84,6 +84,8 @@ class AlertDriver(driver.SmapDriver):
                 if a.select != self.filters[a.id]['select']:
                     self.filters[a.id]['client'].close()
                     del self.filters[a.id]['client']
+            if a.id == requested_id:
+                requested_id = None
 
             # update our comparators
             self.filters[a.id]['test'] = a.test.get_test()
@@ -105,6 +107,13 @@ class AlertDriver(driver.SmapDriver):
 
             # note that we poked this alert
             threads.deferToThread(self._save_check_time, a.id)
+
+        if requested_id != None:
+            # disable any ids that were requested but might have been
+            # deleted or disabled.
+            print "Disabling", requested_id
+            self.filters[requested_id]['client'].close()
+            del self.filters[requested_id]
 
     def data(self, id, values):
         """Callback for data coming into the alert system from the republished.
@@ -139,21 +148,28 @@ class AlertDriver(driver.SmapDriver):
             threads.deferToThread(self.generate_alert, id, 
                                   dict(self.filters[id]['pending_sets']),
                                   dict(self.filters[id]['pending_clears']))
-            self.filters[id]['pending_sets'] = {}
-            self.filters[id]['pending_clears'] = {}
 
     def generate_alert(self, id, setting_uuids, unsetting_uuids):
         """Actually generate an alert, if we're not rate-limited.
         If we are rate-limited, just queue the alert."""
         print "generate alert", id
         a = models.Alert.objects.get(id=id)
-        if len(unsetting_uuids):
-            a.clear_time = datetime.datetime.now()
-            a.set = False
 
-        if len(setting_uuids):
-            a.set_time = datetime.datetime.now()
-            a.set = True
+        # the alarm is set if any of the feeds are set
+        set_state = sum(self.filters[id]['levels'].itervalues())
+        if set_state > 0: 
+            set_state = True
+        else: 
+            set_state = False
+
+        # update the database state on an edge
+        if set_state != a.set:
+            a.set = set_state
+            if set_state == True:
+                a.set_time = datetime.datetime.now()
+            else:
+                a.clear_time = datetime.datetime.now()
+            a.save()
 
         try:
             if (len(setting_uuids) or len(unsetting_uuids)):
@@ -161,10 +177,11 @@ class AlertDriver(driver.SmapDriver):
                          datetime.datetime.now() - a.last_action > \
                          datetime.timedelta(seconds=a.action.rate)):
                     a.action.send_alert(a, setting_uuids, unsetting_uuids)
+                    self.filters[id]['pending_sets'] = {}
+                    self.filters[id]['pending_clears'] = {}
+                    a.last_action = datetime.datetime.now()
+                    a.save()
 
-                # save it even if we didn't send a message
-                a.last_action = datetime.datetime.now()
-                a.save()
         except Exception, e:
             print "logging exception in alert send:", e
             a.error_state = False

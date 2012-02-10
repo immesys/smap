@@ -126,7 +126,7 @@ Number of seconds between checking the alert condition""")
                 'clearing' : clearing,
                 'when_true' : self.alert_when_true,
                 'when_false' : self.alert_when_false,
-                'permalink' : settings.ROOT_NETLOC + '/admin/alarm/log/12' + str(logentry.id),
+                'permalink' : settings.ROOT_NETLOC + '/admin/alert/log/' + str(logentry.id),
                 'alarmpage' : settings.ROOT_NETLOC + '/admin/alert/alert/' + str(alert.id),
                 'timestamp' : logentry.when,
                 'alarm' : alert.__unicode__(),

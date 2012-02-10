@@ -12,7 +12,7 @@ class ActionAdmin(admin.ModelAdmin):
     fields = ('name', 'template', 'group', 'rate', 'alert_when_true', 'alert_when_false')
 
 class AlertAdmin(admin.ModelAdmin):
-    list_display = ('description', '__unicode__', 'last_check', 'set', 'error_state')
+    list_display = ('description', '__unicode__', 'last_check', 'enabled', 'set', 'error_state')
     fieldsets = (
         (None, { 'fields' : ('owner', 'description', 'select', 'test',  'level', 'action', 'enabled')
                  }),
@@ -28,7 +28,7 @@ class AlertAdmin(admin.ModelAdmin):
                 }))
     readonly_fields = ('error_state', 'error_time', 'error', 'last_check',
                        'owner', 'set', 'set_time', 'clear_time')
-    list_filter = ('set', 'error_state', 'owner')
+    list_filter = ('set', 'error_state', 'owner', 'enabled')
     radio_fields = {'level': admin.VERTICAL}
 
 
