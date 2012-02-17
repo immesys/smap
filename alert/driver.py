@@ -108,7 +108,7 @@ class AlertDriver(driver.SmapDriver):
             # note that we poked this alert
             threads.deferToThread(self._save_check_time, a.id)
 
-        if requested_id != None:
+        if requested_id != None and requested_id in self.filters:
             # disable any ids that were requested but might have been
             # deleted or disabled.
             print "Disabling", requested_id
@@ -122,6 +122,7 @@ class AlertDriver(driver.SmapDriver):
         list of new pending alerts and send a message.
         """
         for v in values.itervalues():
+            if not 'Readings' in v: continue
             for dp in v['Readings']:
                 test_value = self.filters[id]['test'](dp[1])
 
@@ -153,7 +154,11 @@ class AlertDriver(driver.SmapDriver):
         """Actually generate an alert, if we're not rate-limited.
         If we are rate-limited, just queue the alert."""
         print "generate alert", id
-        a = models.Alert.objects.get(id=id)
+        try:
+            a = models.Alert.objects.get(id=id)
+        except a.DoesNotExist:
+            print "Alert", id, "disappeared!"
+            return
 
         # the alarm is set if any of the feeds are set
         set_state = sum(self.filters[id]['levels'].itervalues())

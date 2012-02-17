@@ -134,8 +134,9 @@ Number of seconds between checking the alert condition""")
         logentry.message = template.render(context)
         logentry.save()
 
-        to = filter(None, map(operator.attrgetter('email'), self.group.user_set.all()))
-        emaillib.send(to, 'Alert from %s' % settings.ROOT_NETLOC, logentry.message)
+        if self.group != None:
+            to = filter(None, map(operator.attrgetter('email'), self.group.user_set.all()))
+            emaillib.send(to, 'Alert from %s' % settings.ROOT_NETLOC, logentry.message)
             
 def get_default_action():
     poss = Action.objects.filter(name="Default")
@@ -216,5 +217,6 @@ def ping_backend(sender, instance, **kwargs):
             print "Error pong-ing backend:", e
 
 signals.post_save.connect(ping_backend, sender=Alert)
+signals.post_delete.connect(ping_backend, sender=Alert)
 
     
