@@ -7,6 +7,7 @@ log_handler = Resource(views.LogHandler)
 
 urlpatterns = patterns('',
     url(r'^(?P<id>\d+)$', alert_handler, {'emitter_format': 'json'}),
+    url(r'^(?P<grouping>[a-zA-Z][a-zA-Z0-9]*)$', alert_handler, {'emitter_format': 'json'}),
     url(r'^$', alert_handler, {'emitter_format': 'json'}),
     url(r'^log/(?P<id>\d+)$', log_handler, {'emitter_format': 'json'}),
     url(r'^log/$', log_handler, {'emitter_format': 'json'}),

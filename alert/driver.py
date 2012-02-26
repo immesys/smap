@@ -38,10 +38,16 @@ class AlertDriver(driver.SmapDriver):
         self.poll_alerts()
 
     def poll_alerts(self):
-        d = threads.deferToThread(lambda: models.Alert.objects.defer('test').filter(enabled=True))
+        d = threads.deferToThread(lambda: models.Alert.objects.filter(enabled=True))
         d.addCallback(self._check_alerts)
 
     # run in thread
+    def _save_level(self, id, level):
+        a = models.Alert.objects.get(id=id)
+        a.current_level = level
+        a.last_change = datetime.datetime.now()
+        a.save()
+
     def _save_error(self, error, id):
         a = models.Alert.objects.get(id=id)
         a.error_state = False
@@ -75,9 +81,8 @@ class AlertDriver(driver.SmapDriver):
         for a in alerts:
             self._clear_error(a)
             if not a.id in self.filters:
-                self.filters[a.id] = {'levels': {},
-                                      'pending_sets' : {},
-                                      'pending_clears' : {}
+                self.filters[a.id] = {'pending' : {},
+                                      'states' : {}
                                       }
             else:
                 # if the query changed, reconnect with a new query
@@ -88,9 +93,9 @@ class AlertDriver(driver.SmapDriver):
                 requested_id = None
 
             # update our comparators
-            self.filters[a.id]['test'] = a.test.get_test()
+            self.filters[a.id]['test'] = a.get_test()
             self.filters[a.id]['select'] = a.select
-            self.filters[a.id]['set'] = a.set
+            self.filters[a.id]['current_level'] = a.current_level
 
             if not 'client' in self.filters[a.id]:
                 def make_cbs():
@@ -123,34 +128,60 @@ class AlertDriver(driver.SmapDriver):
         """
         for v in values.itervalues():
             if not 'Readings' in v: continue
+            if not 'uuid' in v: continue
+            streamid = v['uuid']
+            max_level = None
             for dp in v['Readings']:
-                test_value = self.filters[id]['test'](dp[1])
+                test_result = self.filters[id]['test'](dp[1])
+                if max_level == None or test_result > max_level:
+                    max_level = test_result
 
-                if test_value and not v['uuid'] in self.filters[id]['pending_sets'] and \
-                        (not v['uuid'] in self.filters[id]['levels'] or
-                         self.filters[id]['levels'][v['uuid']] == False):
-                    # set the alert if it's now SET and it hasn't already been set
-                    # and it's a level change for this stream
-                    #if v['uuid'] in self.filters[id]['levels']:
-                    self.filters[id]['pending_sets'][v['uuid']] = (dp[0], dp[1])
-                    self.filters[id]['levels'][v['uuid']] = True
+                if not streamid in self.filters[id]['states'] or \
+                        self.filters[id]['states'][streamid] != test_result.priority:
+                    # level change
+                    if (not streamid in self.filters[id]['pending'] and test_result.priority > 0) or \
+                            (streamid in self.filters[id]['pending'] and \
+                                 self.filters[id]['pending'][streamid]['priority'] < test_result.priority):
+                        # enqueue a notification if we're more important or there isn't one already
+                        self.filters[id]['pending'][streamid] = {
+                            'priority': test_result.priority,
+                            'time': dp[0],
+                            'value': dp[1]
+                            }
+                    self.filters[id]['states'][streamid] = test_result.priority
 
-                elif not test_value and not v['uuid'] in self.filters[id]['pending_clears'] and \
-                        (not v['uuid'] in self.filters[id]['levels'] or
-                         self.filters[id]['levels'][v['uuid']] == True):
-                    # unset the alert
-                    #if v['uuid'] in self.filters[id]['levels']:
-                    self.filters[id]['pending_clears'][v['uuid']] = (dp[0], dp[1]) 
-                    self.filters[id]['levels'][v['uuid']] = False
+            # save a new alert state if we need to
+            if max_level != self.filters[id]['current_level']:
+                self.filters[id]['current_level'] = max_level
+                threads.deferToThread(self._save_level, id, max_level)
 
-        # generate the alert in a new thread so we can go crazy blocking
-        if len(self.filters[id]['pending_sets']) or \
-                len(self.filters[id]['pending_clears']):
-            threads.deferToThread(self.generate_alert, id, 
-                                  dict(self.filters[id]['pending_sets']),
-                                  dict(self.filters[id]['pending_clears']))
+#                 if test_value and not v['uuid'] in self.filters[id]['pending_sets'] and \
+#                         (not v['uuid'] in self.filters[id]['levels'] or
+#                          self.filters[id]['levels'][v['uuid']] == False):
+#                     # set the alert if it's now SET and it hasn't already been set
+#                     # and it's a level change for this stream
+#                     #if v['uuid'] in self.filters[id]['levels']:
+#                     self.filters[id]['pending_sets'][v['uuid']] = (dp[0], dp[1])
+#                     self.filters[id]['levels'][v['uuid']] = True
 
-    def generate_alert(self, id, setting_uuids, unsetting_uuids):
+#                 elif not test_value and not v['uuid'] in self.filters[id]['pending_clears'] and \
+#                         (not v['uuid'] in self.filters[id]['levels'] or
+#                          self.filters[id]['levels'][v['uuid']] == True):
+#                     # unset the alert
+#                     #if v['uuid'] in self.filters[id]['levels']:
+#                     self.filters[id]['pending_clears'][v['uuid']] = (dp[0], dp[1]) 
+#                     self.filters[id]['levels'][v['uuid']] = False
+#             if len(self.filters[id]['pending']):
+#                 threads.deferToThread(self.generate_alert, id, 
+#                                       self.filters[id]['pending'])
+#         # generate the alert in a new thread so we can go crazy blocking
+#         if len(self.filters[id]['pending_sets']) or \
+#                 len(self.filters[id]['pending_clears']):
+#             threads.deferToThread(self.generate_alert, id, 
+#                                   dict(self.filters[id]['pending_sets']),
+#                                   dict(self.filters[id]['pending_clears']))
+
+    def generate_alert(self, id, pending):
         """Actually generate an alert, if we're not rate-limited.
         If we are rate-limited, just queue the alert."""
         print "generate alert", id
@@ -160,28 +191,15 @@ class AlertDriver(driver.SmapDriver):
             print "Alert", id, "disappeared!"
             return
 
-        # the alarm is set if any of the feeds are set
-        set_state = sum(self.filters[id]['levels'].itervalues())
-        if set_state > 0: 
-            set_state = True
-        else: 
-            set_state = False
-
-        # update the database state on an edge
-        if set_state != a.set:
-            a.set = set_state
-            if set_state == True:
-                a.set_time = datetime.datetime.now()
-            else:
-                a.clear_time = datetime.datetime.now()
-            a.save()
-
         try:
-            if (len(setting_uuids) or len(unsetting_uuids)):
-                if  (a.last_action == None or \
-                         datetime.datetime.now() - a.last_action > \
-                         datetime.timedelta(seconds=a.action.rate)):
-                    a.action.send_alert(a, setting_uuids, unsetting_uuids)
+            if len(pending):
+                max_prio = max(map(operator.itemgetter('priority'), pending.itervalues()))
+
+                if  (a.last_notification == None or \
+                         (datetime.datetime.now() - a.last_notification > \
+                              datetime.timedelta(seconds=a.notification_frequency)) or \
+                         max_prio > a.last_priority:
+                         # a.action.send_alert(a, )
                     self.filters[id]['pending_sets'] = {}
                     self.filters[id]['pending_clears'] = {}
                     a.last_action = datetime.datetime.now()
@@ -193,3 +211,10 @@ class AlertDriver(driver.SmapDriver):
             a.error = "Encountered exception processing template: " + str(e)
             a.error_time = datetime.datetime.now()
             a.save()
+
+if __name__ == '__main__':
+    a = models.Alert.objects.get(id=1)
+    t = a.get_test()
+    vals = [0, 5, 10, 15, 20, 25]
+    for v in vals:
+        print v, t(v)

@@ -67,19 +67,25 @@ level: severity of the alert.  optional, defaults to priority = 30
 action: what to do when triggered.  optional, defaults to "Default"
 enabled: boolean, weather to run this alert.  default True.
     """
-    allow_methods = ('GET', 'PUT', 'POST')
+    allow_methods = ('GET', 'PUT')
     exclude = ('owner', ('action', re.compile("_state")))
     fields = (
         'id',
         'description', 
+        'grouping',
         'enabled', 
         'select',
-        ('test', ('value', 'comparator')),
-        ('level', ('priority',)),
-        'set', 'set_time', 'clear_time',
+#         ('test', ('value', 'comparator')),
+        ('current_level', ('priority', 'description')),
+        ('checks', (
+                'id', 'set', 'set_time', 'clear_time', 'value_1', 'comparator_1',
+                'value_2', 'comparator_2', 
+                ('level', ('description', 'priority')),
+                ('recipients', ('description', 'emails')),
+                )),
+        'last_change', 
         'error_state', 'error', 'error_time',)
-    update_fields = ('description', 'enabled', 'select', 
-                     ('test', ('value', 'comparator')))
+    update_fields = ('description', 'enabled', 'select')
     model = Alert
 
     def update(self, request, id):
@@ -97,25 +103,25 @@ enabled: boolean, weather to run this alert.  default True.
         alert.save()
         return alert
 
-    def create(self, request):
-        """Create a new alert.  We'll only create new tests, the
-        owner, level, and action must already exist"""
-        req = simplejson.loads(request.raw_post_data)
-        new = Alert(description=req['description'],
-                    select=req['select'],
-                    enabled=req.get('enabled', True))
-        try:
-            new.owner = User.objects.get(username=req.get('owner', 'root'))
-            new.level = Level.objects.get(**req.get('level', {'priority': 30}))
-            new.action = Action.objects.get(**req.get('action', {'name': 'Default'}))
-        except ObjectDoesNotExist:
-            return rc.BAD_REQUEST
+#     def create(self, request):
+#         """Create a new alert.  We'll only create new tests, the
+#         owner, level, and action must already exist"""
+#         req = simplejson.loads(request.raw_post_data)
+#         new = Alert(description=req['description'],
+#                     select=req['select'],
+#                     enabled=req.get('enabled', True))
+#         try:
+#             new.owner = User.objects.get(username=req.get('owner', 'root'))
+#             new.level = Level.objects.get(**req.get('level', {'priority': 30}))
+#             new.action = Action.objects.get(**req.get('action', {'name': 'Default'}))
+#         except ObjectDoesNotExist:
+#             return rc.BAD_REQUEST
 
-        new.test, created = Test.objects.get_or_create(**req['test'])
-        if created:
-            new.test.save()
-        new.save()
-        return new
+#         new.test, created = Test.objects.get_or_create(**req['test'])
+#         if created:
+#             new.test.save()
+#         new.save()
+#         return new
 
 class LogHandler(BaseHandler):
     allow_methods = ['GET']
