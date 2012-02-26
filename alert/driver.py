@@ -44,7 +44,7 @@ class AlertDriver(driver.SmapDriver):
     # run in thread
     def _save_level(self, id, level):
         a = models.Alert.objects.get(id=id)
-        a.current_level = level
+        a.current_level = models.Level.objects.get(priority=level)
         a.last_change = datetime.datetime.now()
         a.save()
 
@@ -130,11 +130,8 @@ class AlertDriver(driver.SmapDriver):
             if not 'Readings' in v: continue
             if not 'uuid' in v: continue
             streamid = v['uuid']
-            max_level = None
             for dp in v['Readings']:
                 test_result = self.filters[id]['test'](dp[1])
-                if max_level == None or test_result > max_level:
-                    max_level = test_result
 
                 if not streamid in self.filters[id]['states'] or \
                         self.filters[id]['states'][streamid] != test_result.priority:
@@ -150,10 +147,15 @@ class AlertDriver(driver.SmapDriver):
                             }
                     self.filters[id]['states'][streamid] = test_result.priority
 
+        # find the new max alert level?
+        cur_prio = max(self.filters[id]['states'].values())
+        if cur_prio != self.filters[id]['current_level']:
+            self.filters[id]['current_level'] = cur_prio
+            threads.deferToThread(self._save_level, id, cur_prio)
+
             # save a new alert state if we need to
-            if max_level != self.filters[id]['current_level']:
-                self.filters[id]['current_level'] = max_level
-                threads.deferToThread(self._save_level, id, max_level)
+#             if max_level != self.filters[id]['current_level']:
+#                 self.filters[id]['current_level'] = max_level
 
 #                 if test_value and not v['uuid'] in self.filters[id]['pending_sets'] and \
 #                         (not v['uuid'] in self.filters[id]['levels'] or
@@ -192,18 +194,19 @@ class AlertDriver(driver.SmapDriver):
             return
 
         try:
-            if len(pending):
-                max_prio = max(map(operator.itemgetter('priority'), pending.itervalues()))
+            return
+#             if len(pending):
+#                 max_prio = max(map(operator.itemgetter('priority'), pending.itervalues()))
 
-                if  (a.last_notification == None or \
-                         (datetime.datetime.now() - a.last_notification > \
-                              datetime.timedelta(seconds=a.notification_frequency)) or \
-                         max_prio > a.last_priority:
-                         # a.action.send_alert(a, )
-                    self.filters[id]['pending_sets'] = {}
-                    self.filters[id]['pending_clears'] = {}
-                    a.last_action = datetime.datetime.now()
-                    a.save()
+#                 if  (a.last_notification == None or \
+#                          (datetime.datetime.now() - a.last_notification > \
+#                               datetime.timedelta(seconds=a.notification_frequency)) or \
+#                          max_prio > a.last_priority:
+#                          # a.action.send_alert(a, )
+#                     self.filters[id]['pending_sets'] = {}
+#                     self.filters[id]['pending_clears'] = {}
+#                     a.last_action = datetime.datetime.now()
+#                     a.save()
 
         except Exception, e:
             print "logging exception in alert send:", e

@@ -75,7 +75,7 @@ enabled: boolean, weather to run this alert.  default True.
         'grouping',
         'enabled', 
         'select',
-#         ('test', ('value', 'comparator')),
+        'current',
         ('current_level', ('priority', 'description')),
         ('checks', (
                 'id', 'set', 'set_time', 'clear_time', 'value_1', 'comparator_1',
