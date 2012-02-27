@@ -26,14 +26,22 @@ class Level(models.Model):
     priority = models.IntegerField()
 
     def __cmp__(self, other):
-        print "CMO"
-        return self.priority == other.priority
+        if type(other) == type(1):
+            return self.priority == other
+        else:
+            return self.priority == other.priority
 
     def __gt__(self, other):
-        return self.priority > other.priority
+        if type(other) == type(1):
+            return self.priority > other
+        else:
+            return self.priority > other.priority
 
     def __lt__(self, other):
-        return self.priority < other.priority
+        if type(other) == type(1):
+            return self.priority < other
+        else:
+            return self.priority < other.priority
 
     def __unicode__(self):
         return self.description
@@ -49,21 +57,14 @@ class Action(models.Model):
     """What to do when an alert gets triggered"""
     # when we last did something
     name = models.CharField(max_length=64, unique=True)
-    rate = models.IntegerField(default=60, help_text="""
-Number of seconds between checking the alert condition""")
-
-    alert_when_true = models.BooleanField(default=True)
-    alert_when_false = models.BooleanField(default=True)
-
     template = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
 
-    def send_alert(self, alert, setting_uuids, unsetting_uuids, 
-                   users=[]):        
+    def send_alert(self, to, alert, streams, level):
         # look up the tags for these streams
-        uuids = set(setting_uuids.keys() + unsetting_uuids.keys())
+        uuids = set(streams.keys())
         uuids = map(lambda u: "uuid = '%s'" % u, uuids)
         client = SmapClient()
         tags = client.tags(' or '.join(uuids), nest=True)
@@ -71,13 +72,14 @@ Number of seconds between checking the alert condition""")
 
         def make_context(params):
             rv = []
-            for uid, (t, v) in params.iteritems():
+            for uid, state in params.iteritems():
+                t, v = state['time'], state['value']
                 if uid in tags:
                     rv.append(tags[uid])
                     rv[-1]['AlertTime'] = time.ctime(t/1000)
                     rv[-1]['AlertValue'] = v
             return rv
-        setting, clearing = make_context(setting_uuids), make_context(unsetting_uuids)
+        context = make_context(streams)
         logentry = Log(alert=alert, 
                        when=datetime.datetime.now())
         logentry.save()
@@ -86,19 +88,18 @@ Number of seconds between checking the alert condition""")
         # template.
         template = Template(self.template)
         context = Context({
-                'setting' :  setting,
-                'clearing' : clearing,
-                'when_true' : self.alert_when_true,
-                'when_false' : self.alert_when_false,
+                'streams' :  context,
+                'level' : level,
                 'permalink' : settings.ROOT_NETLOC + '/admin/alert/log/' + str(logentry.id),
                 'alarmpage' : settings.ROOT_NETLOC + '/admin/alert/alert/' + str(alert.id),
                 'timestamp' : logentry.when,
                 'alarm' : alert.__unicode__(),
                 })
         logentry.message = template.render(context)
+        print logentry.message
         logentry.save()
 
-        emaillib.send(to, 'Alert from %s' % settings.ROOT_NETLOC, logentry.message)
+        emaillib.send(to, '%s from %s' % (level, settings.ROOT_NETLOC), logentry.message)
 
 def get_default_action():
     poss = Action.objects.filter(name="Default")
@@ -177,7 +178,7 @@ When we encountered this error.""")
     def current(self):
         c = SmapClient()
         latest = c.latest(self.select, streamlimit=1000)
-        test = self.get_test()
+        test = self.get_test()[0]
         for v in latest:
             if len(v['Readings']):
                 level = test(v['Readings'][0][1])
@@ -191,12 +192,13 @@ When we encountered this error.""")
         checks = self.checks.all().reverse().order_by('level__priority')
         tests = map(operator.methodcaller('get_test'), checks)
         levels = list(map(operator.attrgetter('level'), checks))
+        ids = list(map(operator.attrgetter('id'), checks))
         unset_level = Level.objects.get(id=1)
         def testfn(x):
             for i in xrange(0, len(tests)):
                 if tests[i](x):
-                    return levels[i]
-            return unset_level
+                    return levels[i], ids[i]
+            return unset_level, None
         return testfn
 
 comparators = { 

@@ -51,7 +51,6 @@ class AlertAdmin(admin.ModelAdmin):
     list_filter = ('error_state', 'current_level', 'enabled')
 #     radio_fields = {'level': admin.VERTICAL}
 
-
     # save the creator of this subscription
     def save_model(self, request, obj, form, change):
         instance = form.save(commit=False)
@@ -60,25 +59,17 @@ class AlertAdmin(admin.ModelAdmin):
         instance.save()
         form.save_m2m()
         return instance
- 
-    # fields = ('select', 'url', 'resource', 'key', 'public', 'can_view')
 
-# class LevelAdmin(admin.ModelAdmin):
-#     list_display = ('priority', 'description')
-#     ordering = 'priority',
-
-# class LogAdmin(admin.ModelAdmin):
-#     list_display = ('when', 'alert')
-#     list_filter = ('alert__description',)
-#     fieldsets = (
-#         (None, {'fields': ('when', 'alert') }),
-#         ('Message', {'fields': ('message',)}),
-#         )
-#     readonly_fields = ('when', 'alert', 'message')
+class LogAdmin(admin.ModelAdmin):
+    list_display = ('when', 'alert')
+    list_filter = ('alert__description',)
+    fieldsets = (
+        (None, {'fields': ('when', 'alert') }),
+        ('Message', {'fields': ('message',)}),
+        )
+    readonly_fields = ('when', 'alert', 'message')
 
 admin.site.register(Alert, AlertAdmin)
 admin.site.register(Recipients, RecipientsAdmin)
-# admin.site.register(Level, LevelAdmin)
 admin.site.register(Action, ActionAdmin)
-# admin.site.register(Test, TestAdmin)
-# admin.site.register(Log, LogAdmin)
+admin.site.register(Log, LogAdmin)
