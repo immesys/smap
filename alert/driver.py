@@ -178,6 +178,10 @@ class AlertDriver(driver.SmapDriver):
             print "Alert", id, "disappeared!"
             return
 
+        if a.silent:
+            print "Alert", id, "is silent"
+            return
+
         try:
             notify_prio = max(map(operator.itemgetter('priority'),
                                   self.filters[id]['pending'].values()))

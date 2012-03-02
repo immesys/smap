@@ -29,7 +29,7 @@ class CheckInline(admin.TabularInline):
 
 class AlertAdmin(admin.ModelAdmin):
     list_display = ('description', '__unicode__', 'last_check', 
-                    'current_level', 'enabled', 'error_state')
+                    'current_level', 'enabled', 'silent', 'error_state')
     fieldsets = (
         (None, { 'fields' : ('owner', 'description', 'grouping', 'select', 
                              'notification_frequency', 'enabled')

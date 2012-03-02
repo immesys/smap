@@ -146,6 +146,8 @@ The 'where' clause of a query specifying the streams to run on.""")
 The minimum time interval between notification messages for the same priority level.""")
 
     enabled = models.BooleanField(default=True)
+    silent = models.BooleanField(default=False, help_text="""
+If true, do not generate any notifications""")
 
     last_check = models.DateTimeField(null=True, blank=True, help_text="""
 The last time the backend processed this alert definition.""")

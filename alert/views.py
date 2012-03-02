@@ -44,6 +44,7 @@ class AlertHandler(BaseHandler):
         "description": "ALERT"
     },
     "enabled": true,
+    "silent": false,
     "action": {
       "name" : "Default"
       },
@@ -74,6 +75,7 @@ enabled: boolean, weather to run this alert.  default True.
         'description', 
         'grouping',
         'enabled', 
+        'silent',
         'select',
         'current',
         ('current_level', ('priority', 'description')),
@@ -85,7 +87,7 @@ enabled: boolean, weather to run this alert.  default True.
                 )),
         'last_change', 
         'error_state', 'error', 'error_time',)
-    update_fields = ('description', 'enabled', 'select')
+    update_fields = ('description', 'enabled', 'select', 'silent')
     model = Alert
 
     def update(self, request, id):
