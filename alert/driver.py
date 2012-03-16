@@ -174,7 +174,7 @@ class AlertDriver(driver.SmapDriver):
         print "generate alert", id
         try:
             a = models.Alert.objects.get(id=id)
-        except a.DoesNotExist:
+        except models.Alert.DoesNotExist:
             print "Alert", id, "disappeared!"
             return
 

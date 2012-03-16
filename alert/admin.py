@@ -23,6 +23,7 @@ class CheckInline(admin.TabularInline):
     fields = ['level', 'action', 
               'recipients',
               'comparator_1', 'value_1', 
+              'combiner',
               'comparator_2', 'value_2',
               'set',]
     readonly_fields = ['set']
@@ -32,7 +33,7 @@ class AlertAdmin(admin.ModelAdmin):
                     'current_level', 'enabled', 'silent', 'error_state')
     fieldsets = (
         (None, { 'fields' : ('owner', 'description', 'grouping', 'select', 
-                             'notification_frequency', 'enabled')
+                             'notification_frequency', 'enabled', 'silent')
                  }),
         ('Status', {
                 'fields' : ('current_level', 'last_change', 'last_check',
@@ -42,6 +43,10 @@ class AlertAdmin(admin.ModelAdmin):
         ('Error State', {
                 'classes': ('collapse', ), 
                 'fields': ('error_state', 'error_time', 'error'),
+                }),
+        ('Notifications', {
+                'classes': ('collapse', ), 
+                'fields': ('last_notification', 'last_priority',),
                 }))
     
     inlines = [CheckInline]

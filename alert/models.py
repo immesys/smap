@@ -115,6 +115,9 @@ class Recipients(models.Model):
     extra_users = models.TextField(blank=True, help_text="""
 Comma-separated list of additional email addresses to notify""")
 
+    class Meta:
+        verbose_name_plural = 'recipients'
+
     def emails(self):
         """Get a list of email addresses to notify"""
         
@@ -180,10 +183,10 @@ When we encountered this error.""")
     def current(self):
         c = SmapClient()
         latest = c.latest(self.select, streamlimit=1000)
-        test = self.get_test()[0]
+        test = self.get_test()
         for v in latest:
             if len(v['Readings']):
-                level = test(v['Readings'][0][1])
+                level = test(v['Readings'][0][1])[0]
                 v['level'] = {
                     "priority": level.priority,
                     "description": level.description,
@@ -212,6 +215,11 @@ comparators = {
     'GTE' : operator.__ge__,
     }
 
+combiners = {
+    'AND' : operator.__and__,
+    'OR' : operator.__or__,
+    }
+
 TEST_COMPARATORS = (
     ('GT', u'>'),
     ('LT', u'<'),
@@ -219,6 +227,11 @@ TEST_COMPARATORS = (
     ('GTE', u'\u2265'),
     ('EQ', u'='),
     ('NEQ', u'\u2260'),
+    )
+
+TEST_COMBINERS = (
+    ('AND', 'and'),
+    ('OR', 'or')
     )
 
 class Check(models.Model):
@@ -245,7 +258,9 @@ The last time the alert was cleared.""")
     comparator_1 = models.CharField(max_length=6, 
                                     choices=TEST_COMPARATORS, 
                                     default='GTE')
-
+    combiner = models.CharField(max_length=6,
+                                choices=TEST_COMBINERS,
+                                default='AND')
     value_2 = models.FloatField(null=True, blank=True)
     comparator_2 = models.CharField(max_length=6, 
                                     choices=TEST_COMPARATORS, 
@@ -267,8 +282,9 @@ The last time the alert was cleared.""")
         else:
             c2 = comparators[self.comparator_2]
             v2 = self.value_2
+            cmb = combiners[self.combiner]
             def testfn(x):
-                return c1(x, v1) and c2(x, v2)
+                return cmb(c1(x, v1), c2(x, v2))
         return testfn
 
     def __unicode__(self):
@@ -276,8 +292,9 @@ The last time the alert was cleared.""")
             return self._get_comparator_display(self.comparator_1) + u' ' + str(self.value_1)
         else:
             return self._get_comparator_display(self.comparator_1) + u' ' + \
-                str(self.value_1) + \
-                u' and ' + self._get_comparator_display(self.comparator_2) + \
+                str(self.value_1) + ' ' + \
+                self.combiner + ' ' + \
+                self._get_comparator_display(self.comparator_2) + \
                 u' ' + str(self.value_2)
 
 class Log(models.Model):
@@ -292,8 +309,8 @@ def ping_backend(sender, instance, **kwargs):
             # have to commit before we ping otherwise they might read stale data
         try:
             transaction.commit()
-        except transaction.TransactionManagementError:
-            pass
+        except transaction.TransactionManagementError, e:
+            print "couldn't commit transation", e
 
         try:
             # use this guy's http -- new dep :(

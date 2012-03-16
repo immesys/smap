@@ -40,6 +40,39 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
        return "";
      }
 
+     function setTag(node, tag, value) {
+         var p = $("#__tree_div").jstree("get_path", node);
+         var where = buildClauses(p, node);
+         var query = "set " + tag + " = '" + value + "' where " + where;
+         $.post(backend + "/api/query?" + private_flags, query,
+                function () {
+                    console.log("done setting tag " + query);
+                });
+     }
+
+     function delTag(node, tag) {
+         var p = $("#__tree_div").jstree("get_path", node);
+         var where = buildClauses(p, node);
+         var query = "delete " + tag + " where " + where;
+         console.log("delete " + p + " " + tag);
+         $.post(backend + "/api/query?" + private_flags, query,
+                function () {
+                    console.log("done deleting tag " + query);
+                });
+     }
+
+     function delStream(node) {
+         var p = $("#__tree_div").jstree("get_path", node);
+         var where = buildClauses(p, node);
+         var query = "delete " + " where " + where;
+         if (confirm("Are you sure you want to delete where " + where + "?")) {
+             $.post(backend + "/api/query?" + private_flags, query,
+                    function () {
+                        console.log("done deleting streams");
+                    });
+         }
+     }
+
      function isPrefixTree() {
        return $.type(tree_order[tree_order.length-1]) == 'object' &&
          "prefixTag" in tree_order[tree_order.length-1];
@@ -273,12 +306,115 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
            },
            "contextmenu": {
              "items" : function (node) {
-                 return {
-                   "plot" : {
-                       "label" : "Plot",
-                       "action" : updateSelection,
-                   }
-                }
+                 menu = {
+                     "plot" : {
+                         "label" : "Plot",
+                         "action" : updateSelection,
+                     },
+                 }
+                 console.log(private_flags);
+                 if (private_flags != "") {
+                     menu["type"] = {
+                         "label" : "System",
+                         "submenu" : {
+                             "electric": {
+                                 "label": "electric",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "electric");
+                                 }
+                             },
+                             "steam": {
+                                 "label": "steam",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "steam");
+                                 }
+                             },
+                             "steam cond": {
+                                 "label": "steam condensate",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "steam condensate");
+                                 }
+                             },
+                             "water": {
+                                 "label": "water",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "water");
+                                 }
+                             },
+                             "elevator": {
+                                 "label": "elevator",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "elevator");
+                                 }
+                             },
+                             "gas": {
+                                 "label": "gas",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "gas");
+                                 }
+                             },
+                             "lighting": {
+                                 "label": "lighting",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "lighting");
+                                 }
+                             },
+                             "datacenter": {
+                                 "label": "datacenter",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/System", "datacenter");
+                                 }
+                             },
+                             "no-sustem": {
+                                 "label": "(none)",
+                                 "action": function (node) {
+                                     delTag(node, "Metadata/Extra/System");
+                                 }
+                             }
+                         }
+                     };
+                     menu["servicearea"] = {
+                         "label" : "ServiceRegion",
+                         "submenu" : {
+                             "whole": {
+                                 "label": "building",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/ServiceRegion", "building");
+                                 }
+                             },
+                             "partial": {
+                                 "label": "partial building",
+                                 "action": function (node) {
+                                     setTag(node, "Metadata/Extra/ServiceRegion", "partial building");
+                                 }
+                             },
+                             "no-servicearea": {
+                                 "label": "(none)",
+                                 "action": function (node) {
+                                     delTag(node, "Metadata/Extra/ServiceRegion");
+                                 }
+                             }
+                         }
+                     };
+                     menu["ftype"] = {
+                         "label" : "Type",
+                         "submenu" : {
+                             "oat" : {
+                                 "label" : "oat",
+                                 "action" : function(node) {
+                                     setTag(node, "Metadata/Extra/Type", "oat");
+                                 }
+                             }
+                         }
+                     };
+                     menu["delete"] =  {
+                         "label" : "Delete streams",
+                         "action": function(node) {
+                             delStream(node);
+                         }
+                     };
+                 }
+                 return menu
              }
            }
          })

@@ -25,8 +25,9 @@ def proxy(request):
             request.user.is_authenticated():
         keys = map(operator.attrgetter("key"),
                    models.Subscription.objects.filter((Q(can_view=request.user) | 
-                                                       Q(owner=request.user)) &
-                                                      Q(public=False)))
+                                                       Q(owner=request.user))))
+                   #  &
+                   # Q(public=False)))
         qparams['key'].extend(keys)
 
     qs = urllib.urlencode(qparams, doseq=True)

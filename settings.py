@@ -23,24 +23,28 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_ENGINE = 'django.db.backends.postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'archiver'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'archiver'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'password'         # Not used with sqlite3.
-DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_USER = 'ar'             # Not used with sqlite3.
+DATABASE_PASSWORD = '9Wd0fGn6Ai9MusWlBQ2T'         # Not used with sqlite3.
+DATABASE_HOST = 'www.openbms.org'             # Set to empty string for localhost. Not used with sqlite3.
+# DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+# DATABASE_NAME = 'powerdb2'             # Or path to database file if using sqlite3.
+# DATABASE_USER = 'powerdb2'             # Not used with sqlite3.
+# DATABASE_PASSWORD = 'RuEHerKCXT6h'         # Not used with sqlite3.
+# DATABASE_HOST = 'www.openbms.org'             # Set to empty string for localhost. Not used with sqlite3.
 # DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 # DATABASE_OPTIONS = {
 #    "init_command": "SET storage_engine=INNODB",
 # }
 
-ADMIN_BACKEND = "http://localhost:8080/"
+ADMIN_BACKEND = "http://localhost:8070/"
 
 # the ARchiver Daemon is a process which manages the archive of your
 # time-series data, and tags.  The Berkeley ARD runs at the location
 # below; you can use it if you have an API key; even without it, you
 # can query public streams.
-# ARD_URL = 'http://smote.cs.berkeley.edu:8079'
-ARD_URL = 'http://localhost:8079'
+ARD_URL = 'http://smote.cs.berkeley.edu:8079'
 
 # if you have an API key, put it here.  this will allow you to access
 # streams whose data is associated with your key in the backend and
@@ -83,7 +87,7 @@ LOGIN_URL = '/admin/login'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+ADMIN_MEDIA_PREFIX = '/media/admin.new/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'cit%=^y%q)2r*!ek0*__j9e7l+$sfd#30gythi$g79ip2-cywv'
@@ -99,9 +103,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_NETLOC = 'www.openbms.org'
+ROOT_NETLOC = 'new.openbms.org'
 ROOT_URLCONF = 'powerdb2.urls'
 
 TEMPLATE_DIRS = (
@@ -119,6 +124,7 @@ INSTALLED_APPS = (
     'powerdb2.smap',
     'powerdb2.alert',
     'django.contrib.auth',
+    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.admin',

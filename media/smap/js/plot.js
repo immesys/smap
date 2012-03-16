@@ -136,6 +136,11 @@ function makeSubstreamTable(streamid) {
   }
 }
 
+function interpretTags(val) {
+  return val.replace(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/g, 
+                     "<a href=\"/plot?streamids=$1\">$1</a>");
+}
+
 // render an html description of the tags for a stream
 function makeTagTable(obj) {
   var descr = "<table class=\"tag_table\" id=\"" + obj["uuid"] + "\">";
@@ -152,7 +157,9 @@ function makeTagTable(obj) {
   for (var idx in keys) {
     var off = 0;
     var key = keys[idx];
-    descr += "<tr><td>" + key + "</td><td>" + obj[key] + "</td></tr>";
+    descr += "<tr><td>" + key + "</td><td>" + 
+      interpretTags(obj[key]) + 
+      "</td></tr>";
   }
   descr += "</table>";
   return $(descr);

@@ -8,12 +8,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
 
     # save the creator of this subscription
     def save_model(self, request, obj, form, change):
-        instance = form.save(commit=False)
-        if not hasattr(instance, 'owner'):
-            instance.owner = request.user
-        instance.save()
-        form.save_m2m()
-        return instance
+        obj.owner = request.user
+        obj.save()
 
 admin.site.register(Subscription, SubscriptionAdmin)
 

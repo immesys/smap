@@ -81,7 +81,7 @@ enabled: boolean, weather to run this alert.  default True.
         ('current_level', ('priority', 'description')),
         ('checks', (
                 'id', 'set', 'set_time', 'clear_time', 'value_1', 'comparator_1',
-                'value_2', 'comparator_2', 
+                'combiner', 'value_2', 'comparator_2', 
                 ('level', ('description', 'priority')),
                 ('recipients', ('description', 'emails')),
                 )),
