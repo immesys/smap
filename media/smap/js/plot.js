@@ -41,7 +41,6 @@ function plotInit (no_create) {
   }
 }
 
-
 // return the currently selected time range
 function getTimeRange() {
   var start = new Date(document.getElementById("startDate").value);
