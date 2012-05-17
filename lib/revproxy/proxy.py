@@ -7,12 +7,22 @@ from __future__ import with_statement
 import uuid
 
 from django.views.decorators.csrf import csrf_exempt
-from django.core.servers.basehttp import is_hop_by_hop
+#from django.core.servers.basehttp import is_hop_by_hop
 from django.http import HttpResponse, Http404, HttpResponsePermanentRedirect
 import restkit
 
 from revproxy.util import absolute_uri, header_name, coerce_put_post, \
 rewrite_location, import_conn_manager
+
+# mirrored since this is removed in django 1.4
+_hop_headers = {
+    'connection':1, 'keep-alive':1, 'proxy-authenticate':1,
+    'proxy-authorization':1, 'te':1, 'trailers':1, 'transfer-encoding':1,
+    'upgrade':1
+}
+def is_hop_by_hop(header_name):
+    """Return true if 'header_name' is an HTTP/1.1 "Hop-by-Hop" header"""
+    return header_name.lower() in _hop_headers
 
 _conn_manager = None
 def set_conn_manager():
