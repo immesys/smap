@@ -21,7 +21,7 @@ def proxy(request):
     if hasattr(settings, 'ARD_PRIVATE') and settings.ARD_PRIVATE:
         qparams['private'] = ''
 
-    if hasattr(settings, 'DATABASE_ENGINE') and \
+    if 'default' in settings.DATABASES and \
             request.user.is_authenticated():
         keys = map(operator.attrgetter("key"),
                    models.Subscription.objects.filter((Q(can_view=request.user) | 
@@ -31,7 +31,6 @@ def proxy(request):
         qparams['key'].extend(keys)
 
     qs = urllib.urlencode(qparams, doseq=True)
-    print qs
         
     if len(request.META["QUERY_STRING"]) > 0:
         request.META["QUERY_STRING"] += '&' + qs
