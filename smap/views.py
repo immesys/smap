@@ -89,7 +89,7 @@ def current_datetime(request):
 def plot(request, tree=2):
     """Render the plotting gui using a template
     """
-    if hasattr(settings, 'DATABASE_ENGINE'):
+    if 'default' in settings.DATABASES:
         if not request.user.is_authenticated() and ( \
             'login' in request.GET or 'login' in request.POST):
             return adminsite.login(request)
