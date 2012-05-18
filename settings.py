@@ -121,7 +121,6 @@ STATIC_URL = '/media/'
 # # this makes sure our static files will be served in development mode
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'media/'),
-    ('smap', os.path.join(PROJECT_ROOT, 'smap', 'static')),
 )
 
 INSTALLED_APPS = (
