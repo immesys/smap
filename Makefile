@@ -1,47 +1,36 @@
 
-JSMIN=java -jar ../bin/yuicompressor-2.4.7.jar
-OUTFILE=smap.min.js
-DEV_INCLUDE=../smap/templates/includes-dev.html
-PROD_INCLUDE=../smap/templates/includes.html
+PROJECT=powerdb2
+VERSION=2.0.300
 
-PLOTJSDEPS=jquery-1.5.2/jquery-1.5.2.min.js \
-	jquery-1.5.2/jquery.cookie.js jquery-1.5.2/jquery.hotkeys.js \
-	flot-0.7/js/jquery.flot.js \
-	flot-0.7/js/jquery.flot.stack.min.js flot-0.7/js/jquery.flot.navigate.min.js \
-	flot-0.7/js/jquery.flot.selection.min.js flot-0.7/js/date.js \
-	jquery-ui/development-bundle/ui/jquery.ui.core.js \
- 	jquery-ui/development-bundle/ui/jquery.ui.widget.js \
- 	jquery-ui/development-bundle/ui/jquery.ui.button.js \
-	jquery-ui/development-bundle/ui/jquery.ui.position.js \
-	jquery-ui/development-bundle/ui/jquery.ui.dialog.js \
-	jquery-ui/development-bundle/ui/jquery.ui.mouse.js \
-	jquery-ui/development-bundle/ui/jquery.ui.resizable.js \
-	jquery-ui/development-bundle/ui/jquery.ui.draggable.js \
-	smap/js/anytimec.js  smap/js/cvi_busy_lib.js \
-	smap/js/lib.js smap/js/plot.js \
-	smap/js/colormap.js smap/js/tagtree.js
-PLOTJSDEPS_OTHER=jsTree/jquery.jstree.js
-PLOTJSMIN=$(PLOTJSDEPS:.js=.min.out.js)
+DIST_DIRS=alert api backend conf debian lib media smap status templates
+INSTALL_DIRS=$(filter-out debian, $(DIST_DIRS))
+DIST_FILES=*.py django.wsgi README Makefile 
 
-all: $(DEV_INCLUDE) $(PROD_INCLUDE)
+INSTALL_DIR=/usr/share/$(PROJECT)
 
-$(DEV_INCLUDE):
-	python mkinclude.py $(PLOTJSDEPS) $(PLOTJSDEPS_OTHER) > $@
+all:
+	@echo $(INSTALL_DIRS)
 
-$(PROD_INCLUDE): $(OUTFILE)
-	python mkinclude.py $(OUTFILE) $(PLOTJSDEPS_OTHER) > $@
+install:
+	mkdir -p $(DESTDIR)/$(INSTALL_DIR)
+	cp -r $(INSTALL_DIRS) $(DIST_FILES) $(DESTDIR)/$(INSTALL_DIR)
+	mkdir -p $(DESTDIR)/etc/apache2/sites-available
+	cp conf/powerdb2 $(DESTDIR)/etc/apache2/sites-available
 
-$(OUTFILE): $(PLOTJSMIN)
-	cat $(PLOTJSMIN) > $(OUTFILE)
-	gzip -c $(OUTFILE) > $(OUTFILE).gz
+dist: min dist/$(PROJECT)-$(VERSION).tar.gz
 
-%.min.out.js: %.js
-	$(JSMIN) $< > $@
+dist/$(PROJECT)-$(VERSION).tar.gz:
+	-mkdir dist
+	-mkdir dist/$(PROJECT)-$(VERSION)
+	cp -r $(DIST_DIRS) dist/$(PROJECT)-$(VERSION)
+	cp $(DIST_FILES) dist/$(PROJECT)-$(VERSION)
+	cd dist && tar czf $(PROJECT)-$(VERSION).orig.tar.gz $(PROJECT)-$(VERSION) --exclude-vcs --exclude='*.pyc'
+	rm -rf dist/$(PROJECT)-$(VERSION)
 
-clean: clean-includes clean-minify
+builddeb: 
+	cd dist && tar zxvf $(PROJECT)-$(VERSION).orig.tar.gz
+	cd dist/$(PROJECT)-$(VERSION) && dpkg-buildpackage -rfakeroot -uc -us -S
 
-clean-includes:
-	rm -f $(DEV_INCLUDE) $(PROD_INCLUDE)
 
-clean-minify:
-	rm $(PLOTJSMIN)	$(OUTFILE)
+min:
+	cd media && make

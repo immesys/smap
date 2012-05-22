@@ -27,14 +27,13 @@ DATABASES = {
     'default' : {
         # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'ENGINE' : 'django.db.backends.postgresql_psycopg2',
-        # Or path to database file if using sqlite3.
         'NAME' : 'archiver',             
         # Not used with sqlite3.
-        'USER' : 'ar',
+        'USER' : 'archiver',
         # Not used with sqlite3.
-        'PASSWORD' : '',
+        'PASSWORD' : 'password',
         # Set to empty string for localhost. Not used with sqlite3.
-        'HOST' : 'www.openbms.org',
+        'HOST' : 'localhost',
         }
     }
 
@@ -44,7 +43,7 @@ ADMIN_BACKEND = "http://localhost:8070/"
 # time-series data, and tags.  The Berkeley ARD runs at the location
 # below; you can use it if you have an API key; even without it, you
 # can query public streams.
-ARD_URL = 'http://smote.cs.berkeley.edu:8079'
+ARD_URL = 'http://localhost:8079'
 
 # if you have an API key, put it here.  this will allow you to access
 # streams whose data is associated with your key in the backend and
@@ -108,15 +107,15 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_NETLOC = 'new.openbms.org'
+ROOT_NETLOC = 'localhost'
 ROOT_URLCONF = 'powerdb2.urls'
-
 
 # where static files will be copied by "collectstatic"
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static/')
 
 # the relative URL to serve static files from
 STATIC_URL = '/media/'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 # # this makes sure our static files will be served in development mode
 STATICFILES_DIRS = (
@@ -127,7 +126,6 @@ INSTALLED_APPS = (
     'powerdb2.smap',
     'powerdb2.alert',
     'django.contrib.auth',
-    'django.contrib.sites',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',

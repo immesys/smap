@@ -66,6 +66,14 @@ class Subscription(models.Model):
         if self.description: return self.description
         else: return self.key
 
+class Tree(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=128)
+    tree = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
 class Stream(models.Model):
     id = models.AutoField(primary_key=True)
     subscription = models.ForeignKey(Subscription, db_index=True)

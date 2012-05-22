@@ -28,7 +28,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from django.contrib import admin
-from powerdb2.smap.models import Subscription
+from powerdb2.smap.models import Subscription, Tree
 
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('description', 'key', 'owner', 'public')
@@ -39,5 +39,9 @@ class SubscriptionAdmin(admin.ModelAdmin):
         obj.owner = request.user
         obj.save()
 
+class TreeAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(Subscription, SubscriptionAdmin)
+admin.site.register(Tree, TreeAdmin)
 

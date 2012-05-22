@@ -1,0 +1,16 @@
+Source: powerdb2
+Section: net
+Priority: extra
+Maintainer: Stephen Dawson-Haggerty <stevedh@jackalope.CS.Berkeley.EDU>
+Build-Depends: debhelper (>= 7.0.50~)
+Standards-Version: 3.8.4
+Homepage: http://code.google.com/p/smap-data
+Vcs-Svn: http://smap-data.googlecode.com/svn/branches/powerdb2
+
+Package: powerdb2
+Architecture: all
+Depends: ${misc:Depends}, python-smap, 
+ libapache2-mod-wsgi, libapache2-mod-python, python-django-piston,
+ python (>= 2.6), python-psycopg2, python-django (>= 1.3)
+Pre-Depends: postgresql
+Description: A web frontend for the sMAP time series system

@@ -86,9 +86,10 @@ def dumpcsv(obj, fp):
 def current_datetime(request):
     return HttpResponse(time.time())
 
-def plot(request, tree=2):
+def plot(request, tree=1):
     """Render the plotting gui using a template
     """
+    trees = Tree.objects.all().order_by('id')
     if 'default' in settings.DATABASES:
         if not request.user.is_authenticated() and ( \
             'login' in request.GET or 'login' in request.POST):
@@ -104,6 +105,7 @@ def plot(request, tree=2):
         c['includeheaders'] = 'includes.html'
     else:
         c['includeheaders'] = 'includes-dev.html'
+    c['trees'] = trees
 
     t = loader.get_template('plot.html')
     return HttpResponse(t.render(c))

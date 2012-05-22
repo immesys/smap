@@ -28,7 +28,7 @@ urlpatterns = patterns('',
 
                        # (r'^api/', include('powerdb2.api.urls')),
 
-    (r'^datacenter/', include('powerdb2.datacenter.urls')),
+#    (r'^datacenter/', include('powerdb2.datacenter.urls')),
 
     (r'^robots.txt.*', 'powerdb2.views.robots'),
 
