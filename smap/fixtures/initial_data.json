@@ -1,0 +1,10 @@
+[
+  {
+    "model": "smap.Tree",
+    "pk": 1,
+    "fields" : {
+      "name" : "Instrumentation",
+      "tree" : "[\"Metadata/SourceName\",{\"prefixTag\": \"Path\"}]"
+    }
+  }
+]
