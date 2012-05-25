@@ -1,12 +1,38 @@
-Included modified files:
-plot.js
-tagtree.js 
----both from powerdb2/media/smap/js
 
-status.html
----from powerdb2/smap/templates
+powerdb2 Frontend
+=================
 
-needed to change all 'backend/api/<something>' to 'http://new.openbms.org/backend/api/<something>'
-Then, use CORS firefox extension to prevent single origin from blocking external load
+powerdb2 provides a plotting interface on top of time series data
+loaded into a sMAP archive.  To install, first configure a database
+for django to use; sqlite3 works fine for a small installation:
 
-https://addons.mozilla.org/en-US/firefox/addon/forcecors/
+DATABASES = {
+    'default' : {
+        'ENGINE' : 'django.db.backends.sqlite3',
+        'NAME' : 'smapdb',
+        }
+
+If your archiver is running locally, you are are done; otherwise, edit
+ARD_URL to point to your remote archiver.  To try a system with a lot
+of data, feel free to point yourself at:
+
+ARD_URL = 'http://ar2.openbms.org:8079'
+
+Once you've done this, you need to run two django commands to
+initialize your install:
+
+$ python manage.py collectstatic
+$ python manage.py syncdb
+
+You will want to create a superuser while doing this.
+
+Finally, you should be able to run your local copy of the frontend
+using:
+
+$ python manage.py runserver
+
+Dependencies
+============
+
+Check debian/control for the most up-to-date list of python
+dependencies.
