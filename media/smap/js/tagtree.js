@@ -319,12 +319,19 @@ function makeTagTree(div, tree_order, opts) {
                      menu[mname].submenu[submname].action = eval(menu[mname].submenu[submname].action);
                    }
                  }
+                 menu["delete"] = {
+                   "label" : "Delete streams",
+                   "action" : function(node) { delStream(node); },
+                   "separator_before": true
+                 };
                } else {
                  menu = {};
                }
                menu["plot"] = {
                  "label" : "Plot",
-                 "action" : updateSelection
+                 "action" : updateSelection,
+                 "separator_before": true,
+                 "icon" : "/media/smap/img/plotable.png"
                };
                return menu;
              }
