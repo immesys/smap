@@ -310,7 +310,7 @@ function makeTagTree(div, tree_order, opts) {
            },
            "contextmenu": {
              "items" : function (node) {
-               if (opts.context_menu) { // && private_flags != "") {
+               if (opts.context_menu && private_flags != "") {
                  menu = opts.context_menu;
                  // have to eval all the actions so they run in the
                  // context of this tree.
