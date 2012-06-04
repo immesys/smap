@@ -20,10 +20,14 @@ function treeOpenPath(path) {
 // div: jquery div selected, place to build tree
 // tree_order: an array representing the tree configuration; a list of
 //   level configurations
-// selectcb: callback called with (path, [uuid list], label text)
-//   arguments when streams are selected in the tree
-// deselectcb: callback called with (uuid) when a stream is deselected
-function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
+// opts: dict of extra configuration options
+//  select: callback called with (path, [uuid list], label text)
+//    arguments when streams are selected in the tree
+//  deselect: callback called with (uuid) when a stream is deselected
+//  clear: callback called when plot is cleared
+//  openpath: path array to open after loading this tree
+//  context_men: a jstree menu specification to add to the tree nodes
+function makeTagTree(div, tree_order, opts) { 
  $(function() {
      // var last_selected = [];
      var separator = '/';
@@ -172,7 +176,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
                      seriesLabel = tree_order[p.length - 1].seriesLabel;
                    }
                    // trigger the select callback with the uuid
-                   selectcb(p, obj, seriesLabel);
+                   opts.select(p, obj, seriesLabel);
                  }, "text");
            
          });
@@ -186,7 +190,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
          id: "__tree_div" }));
      $("#__plot_selected").button();
      $("#__plot_selected").click(function () {
-         clearcb(); updateSelection();
+         opts.clear(); updateSelection();
      });
 
      $("#__tree_div")
@@ -255,7 +259,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
                                 "icon": icon,
                               },
                               "state": state,
-                             }
+                             };
                    }
                  } else if (isPrefixTree()) {
                    // build a prefix tree 
@@ -283,7 +287,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
                    for (var tv in tags) {
                      rv[rv.length] = {"data" : {
                                         "title" : tv,
-                                        "icon" : "/media/smap/img/plotable.png",
+                                        "icon" : "/media/smap/img/plotable.png"
                                       },
                                       "state": tags[tv]};
                    }
@@ -302,119 +306,27 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
              }
            },
            "ui": {
-             "select_multiple_modifier" : "shift",
+             "select_multiple_modifier" : "shift"
            },
            "contextmenu": {
              "items" : function (node) {
-                 menu = {
-                     "plot" : {
-                         "label" : "Plot",
-                         "action" : updateSelection,
-                     },
+               if (opts.context_menu) { // && private_flags != "") {
+                 menu = opts.context_menu;
+                 // have to eval all the actions so they run in the
+                 // context of this tree.
+                 for (var mname in menu) {
+                   for (submname in menu[mname].submenu) {
+                     menu[mname].submenu[submname].action = eval(menu[mname].submenu[submname].action);
+                   }
                  }
-                 console.log(private_flags);
-                 if (private_flags != "") {
-                     menu["type"] = {
-                         "label" : "System",
-                         "submenu" : {
-                             "electric": {
-                                 "label": "electric",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "electric");
-                                 }
-                             },
-                             "steam": {
-                                 "label": "steam",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "steam");
-                                 }
-                             },
-                             "steam cond": {
-                                 "label": "steam condensate",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "steam condensate");
-                                 }
-                             },
-                             "water": {
-                                 "label": "water",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "water");
-                                 }
-                             },
-                             "elevator": {
-                                 "label": "elevator",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "elevator");
-                                 }
-                             },
-                             "gas": {
-                                 "label": "gas",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "gas");
-                                 }
-                             },
-                             "lighting": {
-                                 "label": "lighting",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "lighting");
-                                 }
-                             },
-                             "datacenter": {
-                                 "label": "datacenter",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/System", "datacenter");
-                                 }
-                             },
-                             "no-sustem": {
-                                 "label": "(none)",
-                                 "action": function (node) {
-                                     delTag(node, "Metadata/Extra/System");
-                                 }
-                             }
-                         }
-                     };
-                     menu["servicearea"] = {
-                         "label" : "ServiceRegion",
-                         "submenu" : {
-                             "whole": {
-                                 "label": "building",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/ServiceRegion", "building");
-                                 }
-                             },
-                             "partial": {
-                                 "label": "partial building",
-                                 "action": function (node) {
-                                     setTag(node, "Metadata/Extra/ServiceRegion", "partial building");
-                                 }
-                             },
-                             "no-servicearea": {
-                                 "label": "(none)",
-                                 "action": function (node) {
-                                     delTag(node, "Metadata/Extra/ServiceRegion");
-                                 }
-                             }
-                         }
-                     };
-                     menu["ftype"] = {
-                         "label" : "Type",
-                         "submenu" : {
-                             "oat" : {
-                                 "label" : "oat",
-                                 "action" : function(node) {
-                                     setTag(node, "Metadata/Extra/Type", "oat");
-                                 }
-                             }
-                         }
-                     };
-                     menu["delete"] =  {
-                         "label" : "Delete streams",
-                         "action": function(node) {
-                             delStream(node);
-                         }
-                     };
-                 }
-                 return menu
+               } else {
+                 menu = {};
+               }
+               menu["plot"] = {
+                 "label" : "Plot",
+                 "action" : updateSelection
+               };
+               return menu;
              }
            }
          })
@@ -422,7 +334,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
                var node = $(event.target).closest("li");
                if ($(node).hasClass("jstree-leaf")) {
                  $("#__tree_div").jstree("select_node", node);
-                 clearcb();
+                 opts.clear();
                  updateSelection();
                } else {
                  $("#__tree_div").jstree("toggle_node", node);
@@ -435,7 +347,7 @@ function makeTagTree(div, tree_order, selectcb, deselectcb, clearcb, openpath) {
                // updateSelection();
              })
        .bind("loaded.jstree", function() {
-               treeOpenPath(openpath);
+               treeOpenPath(opts.openpath);
              });
    });
 }

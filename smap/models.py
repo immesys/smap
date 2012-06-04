@@ -74,6 +74,28 @@ class Tree(models.Model):
     def __unicode__(self):
         return self.name
 
+class MenuTag(models.Model):
+    id = models.AutoField(primary_key=True)
+    display_name = models.CharField(max_length=64, db_index=True, 
+                                    null=True, blank=True,
+                                    help_text="Name to show for tag")
+    tag_name = models.CharField(max_length=64, db_index=True,
+                                help_text="Actual name of the tag in sMAP")
+
+    def __unicode__(self):
+        if self.display_name != None and self.display_name != '':
+            return self.display_name
+        else:
+            return self.tag_name
+
+class MenuValue(models.Model):
+    id = models.AutoField(primary_key=True)
+    tag_name = models.ForeignKey(MenuTag)
+    tag_val = models.TextField(help_text="value to set")
+
+    def __unicode__(self):
+        return self.tag_name.__unicode__() + ": " + self.tag_val
+
 class Stream(models.Model):
     id = models.AutoField(primary_key=True)
     subscription = models.ForeignKey(Subscription, db_index=True)

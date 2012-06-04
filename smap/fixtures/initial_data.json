@@ -6,5 +6,117 @@
       "name" : "Instrumentation",
       "tree" : "[\"Metadata/SourceName\",{\"prefixTag\": \"Path\"}]"
     }
+  },
+  {
+    "model": "smap.MenuTag",
+    "pk" : 1,
+    "fields" : {
+      "display_name" : "System",
+      "tag_name" : "Metadata/Extra/System"
+    }
+  },
+  {
+    "model": "smap.MenuTag",
+    "pk" : 2,
+    "fields" : {
+      "display_name" : "ServiceRegion",
+      "tag_name" : "Metadata/Extra/ServiceRegion"
+    }
+  },
+  {
+    "model": "smap.MenuTag",
+    "pk" : 3,
+    "fields" : {
+      "display_name" : "Type",
+      "tag_name" : "Metadata/Extra/Type"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 1,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "electric"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 2,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "steam"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 3,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "steam_condensate"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 4,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "water"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 5,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "elevator"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 6,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "gas"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 7,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "lighting"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 8,
+    "fields" : {
+      "tag_name" : 1,
+      "tag_val" : "datacenter"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 9,
+    "fields" : {
+      "tag_name" : 2,
+      "tag_val" : "building"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 10,
+    "fields" : {
+      "tag_name" : 2,
+      "tag_val" : "partial building"
+    }
+  },
+  {
+    "model": "smap.MenuValue",
+    "pk" : 11,
+    "fields" : {
+      "tag_name" : 3,
+      "tag_val" : "oat"
+    }
   }
 ]

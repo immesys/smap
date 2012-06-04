@@ -28,7 +28,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from django.contrib import admin
-from powerdb2.smap.models import Subscription, Tree
+from powerdb2.smap.models import Subscription, Tree, MenuTag, MenuValue
 
 class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('description', 'key', 'owner', 'public')
@@ -42,6 +42,13 @@ class SubscriptionAdmin(admin.ModelAdmin):
 class TreeAdmin(admin.ModelAdmin):
     pass
 
+class MenuTagAdmin(admin.ModelAdmin):
+    pass
+
+class MenuValueAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.register(Tree, TreeAdmin)
-
+admin.site.register(MenuTag, MenuTagAdmin)
+admin.site.register(MenuValue, MenuValueAdmin)

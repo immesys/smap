@@ -48,6 +48,8 @@ import time
 import datetime
 import calendar
 from dateutil.tz import *
+from ordereddict import OrderedDict
+import json
 
 from models import *
 import powerdb2.settings as settings
@@ -109,3 +111,27 @@ def plot(request, tree=1):
 
     t = loader.get_template('plot.html')
     return HttpResponse(t.render(c))
+
+def menu(request):
+    """Generate a jstree.js contextmenu containing the tags we want to
+    allow"""
+    m = OrderedDict()
+
+    for tn in MenuTag.objects.all().order_by('id'):
+        display, tag = tn.__unicode__(), tn.tag_name
+        m[display] = OrderedDict()
+        m[display]["label"] = display
+        m[display]["submenu"] = OrderedDict()
+        for val in MenuValue.objects.filter(tag_name=tn).order_by("id"):
+            value = val.tag_val
+            m[display]["submenu"][value] = {
+                'label': value,
+                'action': "(function(node) { setTag(node, \"%s\", \"%s\"); })" % (tag, value)
+                }
+        m[display]["submenu"]["no-" + display] = {
+            "label" : "(none)",
+            "action" : "(function(node) { delTag(node, \"%s\"); })" % tag,
+            }
+    return HttpResponse("var tag_menu = " + 
+                        json.dumps(m) + ";", mimetype="application/javascript")
+
