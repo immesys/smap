@@ -8,7 +8,8 @@ import powerdb2.smap.models
 
 EXTRA_SQL = ['sql/extra.psql',
              'sql/insert-tag.psql',
-             'sql/insert-stream.psql']
+             'sql/insert-stream.psql',
+             'sql/fix-constraints.psql']
 
 @transaction.commit_manually
 def install_extras(sender, **kwargs):
