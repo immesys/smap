@@ -48,8 +48,11 @@ import time
 import datetime
 import calendar
 from dateutil.tz import *
-from ordereddict import OrderedDict
 import json
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 from models import *
 import powerdb2.settings as settings
