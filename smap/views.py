@@ -91,7 +91,7 @@ def dumpcsv(obj, fp):
 def current_datetime(request):
     return HttpResponse(time.time())
 
-def plot(request, tree=1):
+def plot(request, tree=0):
     """Render the plotting gui using a template
     """
     trees = Tree.objects.all().order_by('id')
@@ -110,7 +110,7 @@ def plot(request, tree=1):
         c['includeheaders'] = 'includes.html'
     else:
         c['includeheaders'] = 'includes-dev.html'
-    c['trees'] = trees
+    c['trees'] = zip(trees, range(0, len(trees)))
 
     t = loader.get_template('plot.html')
     return HttpResponse(t.render(c))
