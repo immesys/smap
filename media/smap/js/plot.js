@@ -338,7 +338,7 @@ function updateCsvLink(ref) {
   var query = backend + "/api/data/uuid/" + escape(ref) +
     "?starttime=" + escape(start) + 
     "&endtime=" + escape(end) + 
-    "&format=csv&tags=" +
+    "&format=csv&tags=&timefmt=iso8601" +
     "&" + private_flags;
   document.getElementById("csv_" + ref).href = query;
 }
