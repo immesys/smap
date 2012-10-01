@@ -102,11 +102,3 @@ class Stream(models.Model):
     uuid = models.CharField(unique=True, max_length=36)
     class Meta:
         db_table = u'stream'
-
-class Metadata2(models.Model):
-    id = models.AutoField(primary_key=True)
-    stream = models.ForeignKey(Stream, db_index=True)
-    tagname = models.CharField(max_length=64, db_index=True)
-    tagval = models.TextField()
-    class Meta:
-        db_table = u'metadata2'
