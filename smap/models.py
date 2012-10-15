@@ -41,6 +41,7 @@ import uuid
 
 from django.db import models
 from django.contrib.auth.models import User
+from django_hstore import hstore
 
 def new_key():
     return ''.join(map(lambda x: random.choice(string.letters + string.digits),
@@ -100,5 +101,6 @@ class Stream(models.Model):
     id = models.AutoField(primary_key=True)
     subscription = models.ForeignKey(Subscription, db_index=True)
     uuid = models.CharField(unique=True, max_length=36)
+    metadata = hstore.DictionaryField()
     class Meta:
         db_table = u'stream'

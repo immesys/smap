@@ -26,7 +26,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default' : {
         # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'ENGINE' : 'django.db.backends.postgresql_psycopg2',
+        'ENGINE' : 'django_hstore.postgresql_psycopg2',
         'NAME' : 'archiver',             
         # Not used with sqlite3.
         'USER' : 'archiver',
