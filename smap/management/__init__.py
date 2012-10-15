@@ -6,10 +6,8 @@ from django.db.models.signals import post_syncdb
 from django.db import connection, transaction, utils
 import powerdb2.smap.models
 
-EXTRA_SQL = ['sql/extra.psql',
-             'sql/insert-tag.psql',
-             'sql/insert-stream.psql',
-             'sql/fix-constraints.psql']
+EXTRA_SQL = ['sql/insert-stream.psql',
+             ]
 
 @transaction.commit_manually
 def install_extras(sender, **kwargs):
