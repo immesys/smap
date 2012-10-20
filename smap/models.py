@@ -56,7 +56,7 @@ class Subscription(models.Model):
     url = models.CharField(max_length=512, default='', blank=True)
     resource = models.CharField(max_length=512, default='/+')
     key = models.CharField(max_length=36, default=new_key)
-    public = models.BooleanField(default=True)
+    public = models.BooleanField(default=True, db_index=True)
     description = models.CharField(max_length=256)
     owner = models.ForeignKey(User)
     can_view = models.ManyToManyField(User, related_name='can_view', blank=True)
@@ -100,7 +100,7 @@ class MenuValue(models.Model):
 class Stream(models.Model):
     id = models.AutoField(primary_key=True)
     subscription = models.ForeignKey(Subscription, db_index=True)
-    uuid = models.CharField(unique=True, max_length=36)
-    metadata = hstore.DictionaryField()
+    uuid = models.CharField(unique=True, max_length=36, db_index=True)
+    metadata = hstore.DictionaryField(db_index=False, default='hstore(array[]::varchar[])')
     class Meta:
         db_table = u'stream'

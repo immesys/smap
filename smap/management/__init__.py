@@ -7,7 +7,7 @@ from django.db import connection, transaction, utils
 import powerdb2.smap.models
 
 EXTRA_SQL = ['sql/insert-stream.psql',
-             ]
+             'sql/set-metadata-default.psql']
 
 @transaction.commit_manually
 def install_extras(sender, **kwargs):
