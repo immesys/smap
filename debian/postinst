@@ -33,6 +33,10 @@ CREATE DATABASE archiver WITH owner = archiver;
 GRANT ALL PRIVILEGES ON DATABASE archiver TO archiver;
 EOF
 
+    cat <<EOF | sudo -u postgres psql archiver
+CREATE EXTENSION hstore;
+EOF
+
     # install the database tables
     python manage.py syncdb
 
