@@ -16,6 +16,10 @@ var plot_data = {};
 var current_zoom = {};
 
 function plotInit (no_create) {
+
+  timezoneJS.timezone.zoneFileBasePath = '/media/tz';
+  timezoneJS.timezone.init();
+
   // set up a reasonable range by default
   if (initializing && "start" in page_args && "end" in page_args) {
     var then = new Date(page_args["start"] * 1);
@@ -100,9 +104,11 @@ function selectSubStream(streamid, range) {
 function mungeTimes(data, tz) {
   if (data.length == 0) return;
   var point = new timezoneJS.Date();
+  console.log('setting timezone to ' + tz);
   point.setTimezone(tz);
   point.setTime(data[0][0]);
-  var offset = point.getLocalOffset();
+  var offset = point.getTimezoneOffset();
+  console.log('local offset is ' + offset);
   for (i = 0; i < data.length; i++) {
     data[i][0] -= offset * 60 * 1000;
   }

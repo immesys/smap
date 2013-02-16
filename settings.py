@@ -27,13 +27,14 @@ DATABASES = {
     'default' : {
         # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'ENGINE' : 'django_hstore.postgresql_psycopg2',
-        'NAME' : 'archiver',             
+        'NAME' : 'archiver',       
         # Not used with sqlite3.
         'USER' : 'archiver',
         # Not used with sqlite3.
-        'PASSWORD' : 'password',
+        'PASSWORD' : 'JuKEJ2c3BqvBfdA',
         # Set to empty string for localhost. Not used with sqlite3.
-        'HOST' : 'localhost',
+        'HOST' : 'verde.cs.berkeley.edu',
+        'PORT': 5433 
         }
     }
 
@@ -43,7 +44,8 @@ ADMIN_BACKEND = "http://localhost:8070/"
 # time-series data, and tags.  The Berkeley ARD runs at the location
 # below; you can use it if you have an API key; even without it, you
 # can query public streams.
-ARD_URL = 'http://localhost:8079'
+ARD_URL = 'http://ar2.openbms.org:8079'
+# ARD_URL = 'http://localhost:8079'
 
 # if you have an API key, put it here.  this will allow you to access
 # streams whose data is associated with your key in the backend and
