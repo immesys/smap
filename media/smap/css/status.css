@@ -1,0 +1,65 @@
+.main {
+  width: 1220px;
+  margin: auto;
+  padding: 10px;
+}
+
+.left {
+  float: left;
+  width: 600px;
+  height: 100%;
+  position: relative;
+}
+
+.right {
+  width: 560px;
+  height: 100%;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 0px 10px 0px 10px;
+  border: 1px solid;
+  float: left;
+  border-color: rgb(221, 221, 221);
+}
+
+#datatable {
+  font-size: 12px;
+}
+
+#vquery{
+  background-color: #E9F0F5;
+  border-width: 1px;
+  border-color: #c0c0c0;
+}
+
+#metadata{
+  margin: 10px 5px 0px 5px;
+}
+
+#datatable tr.even:hover {
+    background-color: #FFFFE0;
+}
+ 
+#datatable tr.even:hover td.sorting_1 {
+    background-color: #FFFFCC;
+}
+ 
+#datatable tr.odd:hover {
+    background-color: #FFFFE0;
+}
+ 
+#datatable tr.odd:hover td.sorting_1 {
+    background-color: #FFFFCC;
+}
+
+#datatable tr.odd {
+    background-color: #F0F6FA;
+}
+
+#datatable tr.odd td.sorting_1 {
+  background-color: #E6F2FA;
+}
+
+#datatable tr.even td.sorting_1 {
+  background-color: #F0F6FA;
+}

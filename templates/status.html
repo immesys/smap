@@ -1,130 +1,192 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sMAP Stream Status</title>
-    <link rel="stylesheet" type="text/css" href="/media/smap/css/anytimec.css"/>
-
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/media/smap/js/anytimec.js"></script>
-    <script type="text/javascript" src="/media/smap/js/lib.js"></script>
-    <script type="text/javascript" src="/media/smap/js/cvi_busy_lib.js"></script>
-
-    <style type="text/css">
-.status-selected {
-  background-color: #fffacd;
-}
-.td_status {
-  width: 20px;
-  height: 20px;
-}
-    </style>
+    <link href="/media/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/media/smap/css/vquery.css" rel="stylesheet" media="screen">
+    <link href="/media/smap/css/status.css" rel="stylesheet" media="screen">
+    <link href="/media/smap/css/statchart.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css">
   </head>
+
   <body>
-    <div id="main">
-      <div id="status" style="float: left; width: 50%; height: 100%">
-        <input type="text" id="date" size=30>
-        <select id="sources">
-        </select>
-        <br>
-        <table id="statustable">
-        </table>
-      </div>
-      <div id="tag_div" style="right: 0px; width: 50%; height: 100%; position: fixed">
-        <table id="tagtable">
-        </table>
+
+    <div class="main">
+      <div class="left">
+        <div id="vquery"></div>
+        <div id='stream-div' style="height: 90%; overflow: auto; margin-top:10px;"></div>
+      </div> 
+
+      <div class="right">
+        <div id="statchart"></div>
+        <div id="metadata" style="overflow: auto;"></div>
       </div>
     </div>
-    <script type="text/javascript">
-      var datefmt = "%W %M %e";
-      var loaded_tags = [];
-      var display_pending = undefined;
 
-      var converter = new AnyTime.Converter( { format: datefmt });
-      $("#date").val(converter.format(new Date()));
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
+    <script src="/media/smap/js/vquery.js"></script>
+    <script src="/media/smap/js/underscore-min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+    <script src="/media/bootstrap/js/bootstrap.min.js"></script>
 
-      AnyTime.picker( "date", 
-      { format: datefmt, firstDOW: 0 } );
+    <script>
+      var enum_id = 1;
+      var url = "http://new.openbms.org/backend/api/query";
 
-      function sort_latest(x, y) {
-        return (x[1]) < y[1] ? -1 : (x[1] > y[1] ? 1 : 0);
+      function genStreamTable(data){
+        var html, row = '';
+        data.forEach(function(d){
+          var _date = new Date(d.Readings[0][0]);
+          try{
+            var _reading = d.Readings[0][1].toFixed(2);
+          }catch(err){}
+          row = "<tr class='stream-row' data-uuid='" + d.uuid + "'>";
+          row += "<td class='path'>" + d.Path + "</td>";
+          row += "<td class='reading'>" + _reading + "</td>";
+          row += "<td class='timestamp'>" + _date + "</td>";
+          row += "</tr>";
+          html += row; 
+        });
+        return html;
       }
 
-      function update_tags() {
-        if (!$.isEmptyObject(loaded_tags[display_pending])) {
-          $("#tagtable").empty();
-          $("tr[selected=true]").attr("class", "default")
-          $("tr[selected=true]").attr("selected", false);
-          $("#" + display_pending).attr("class", "status-selected");
-          $("#" + display_pending).attr("selected", true);
-          for (var tagname in loaded_tags[display_pending]) {
-            $("#tagtable").append($("<tr><td>" + tagname + "</td><td>" +
-                                  loaded_tags[display_pending][tagname] + "</td></tr>"));
-          }
+      function convertJSON(data){
+        var json = []
+        for (i in data){
+          var el = data[i];
+          json.push({"timestamp": el[0], "reading": el[1]});
         }
+        return json;
       }
 
-      function get_tags(uuid) {
-        if (!(uuid in loaded_tags)) {
-          loaded_tags[uuid] = [];
-          var overlay = getBusyOverlay(document.getElementById("busy_" + uuid));
-          $.get("/backend/api/tags/uuid/" + escape(uuid), function (resp) {
-             var tags = eval(resp)[0];
-             overlay.remove();
-             loaded_tags[uuid] = flatten(tags);
-             if (display_pending == uuid) {
-               update_tags();
-             }
-          });
-        }
+      function renderStreamChart(data){
+        var data_json = convertJSON(data.Readings);
+
+        var margin = {top: 20, right: 20, bottom: 20, left: 50},
+            width = 560 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+
+        var x = d3.time.scale()
+            .range([0, width]);
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        var line = d3.svg.line()
+            .x(function(d) { return x(d.timestamp); })
+            .y(function(d) { return y(d.reading); });
+
+        var svg = d3.select("#statchart").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+         
+         x.domain(d3.extent(data_json, function(d) { return d.timestamp; }));
+         y.domain(d3.extent(data_json, function(d) { return d.reading; }));
+
+         svg.append("g")
+             .attr("class", "x axis")
+             .attr("transform", "translate(0," + height + ")")
+             .call(xAxis);
+           
+         svg.append("g")
+             .attr("class", "y axis")
+             .call(yAxis)
+           .append("text")
+             .attr("class", "unit-text")
+             .attr("transform", "rotate(-90)") 
+             .attr("y", 6)
+             .attr("dy", ".71em")
+             .style("text-anchor", "end")
+             
+         svg.append("path")
+             .datum(data_json)
+             .attr("class","line")
+             .attr("d", line);          
       }
-
-      $(document).ready(function () {
-
-        $.get("/backend/api/query/Metadata__SourceName", function (resp) {
-          var sources = eval(resp);
-          for (var i = 0; i < sources.length; i++) {
-            $("#sources")
-              .append($("<option>", { value: sources[i] })
-              .text(sources[i]));
+      
+      function renderStreamMetadata(uuid){
+        var query = "select * where uuid='" + uuid + "'";
+        $.ajax({
+          url: url,
+          type: "post",
+          data: query,
+          success: function(res){
+            var m = JSON.stringify(res);
+            m = m.replace(/\,/g,'<br>');
+            $('#metadata').empty();
+            $('#metadata').html(m);
+            r = res[0];
+            d3.select(".unit-text")
+              .text(r.Properties.UnitofMeasure);
           }
         });
-
-        $("#sources").change(function () {
-           var source = $("#sources").val();
-           var converter = new AnyTime.Converter( { format: datefmt });
-           var whence = converter.parse($("#date").val()).getTime();
-           var ctrl = getBusyOverlay(document.getElementById("status"));
-           $.get("/backend/api/prev/Metadata__SourceName/" + escape(source) +
-                 "?starttime=" + escape(whence) + "&limit=1&streamlimit=0",
-                 function(resp) {
-                   var latest = eval(resp);
-                   ctrl.remove();
-                   var streams = [];
-                   for (var i = 0; i < latest.length; i++) {
-                     streams.push([latest[i]['uuid'], 
-                                   latest[i]['Readings'].length > 0 ?
-                                   latest[i]['Readings'][0][0] : 0]);
-                   }
-                   streams.sort(sort_latest);
-                   $("#statustable").empty();
-                   for (var i = 0; i < streams.length; i++) {
-                      var elt = $("<tr id=\"" + streams[i][0] + "\"><td>" + streams[i][0]
-                                       + "</td><td>" + new Date(streams[i][1])
-                                       + "</td><td><div class=\"td_status\" id=\"busy_" + streams[i][0] + "\"></div></td></tr>");
-                      elt.mouseover(function () {
-                         var key = streams[i][0];
-                         return function () {
-                            display_pending = key;
-                            get_tags(key);
-                            update_tags();
-                         };
-                      }());
-                                       
-                      $("#statustable").append(elt);
-                   }
-           });
+      }
+  
+      function getStreamData(uuid){
+        var query = "select data before now limit 1000 where uuid='" + uuid + "'";
+        $.ajax({
+          url: url,
+          type: "post",
+          data: query,
+          success: function(data){
+            var d = data[0];
+            var readings = d.Readings;
+            var uuid = d.uuid
+            var last = readings.pop();
+            $('#statchart').empty();
+            renderStreamChart(d);
+            renderStreamMetadata(uuid);
+          }
         });
-      });
+      }
+      
+      var vqCallback = function(data){
+        var html = genStreamTable(data);
+        var viewportHeight = $(window).height();
+        var vqueryHeight = $('#vquery').outerHeight();
+        $('#stream-div').height(viewportHeight-vqueryHeight-20);
+        $('#datatable').remove();
+        $('#stream-div').append(' \
+          <table id="datatable" class="table table-compact table-bordered"> \
+            <thead> \
+              <tr> \
+                <th>Path</th> \
+                <th>current value</th> \
+                <th>local time</th> \
+              </tr> \
+            </thead> \
+          <tbody id="streams"></tbody> \
+          </table>');
+        $('#streams').html(html);
+        var dtable = $('#datatable').dataTable({
+          "bProcessing": true,
+          "bFilter": false,
+          "bPaginate": false
+        });
+        $('#datatable_info').remove();
+        $('.stream-row').mouseover(function(){
+          var uuid = $(this).data("uuid");
+          getStreamData(uuid);
+        });
+      }
+      
+      new VQuery(url, vqCallback);
+     
     </script>
   </body>
 </html>
+
