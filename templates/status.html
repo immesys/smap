@@ -35,13 +35,13 @@
 
     <script>
       var enum_id = 1;
-      var url = "http://new.openbms.org/backend/api/query";
+      var url = "/backend/api/query";
 
       function genStreamTable(data){
         var html, row = '';
         data.forEach(function(d){
-          var _date = new Date(d.Readings[0][0]);
           try{
+            var _date = new Date(d.Readings[0][0]);
             var _reading = d.Readings[0][1].toFixed(2);
           }catch(err){}
           row = "<tr class='stream-row' data-uuid='" + d.uuid + "'>";
