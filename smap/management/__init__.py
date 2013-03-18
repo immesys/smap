@@ -18,6 +18,7 @@ def install_extras(sender, **kwargs):
         print "running", sqlfile
         with open(os.path.join(me, sqlfile), 'r') as fp:
             queries = fp.read()
+            queries = queries.replace('%', '%%')
 
         try:
             cursor.execute(queries)
