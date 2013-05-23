@@ -63,3 +63,11 @@
 #datatable tr.even td.sorting_1 {
   background-color: #F0F6FA;
 }
+
+#datatable tr.selected {
+  background-color: #FFFFCC;
+}
+
+#datatable tr.selected td.sorting_1{
+  background-color: #FFFFCC;
+}

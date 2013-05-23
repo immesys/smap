@@ -8,3 +8,7 @@ def status(request):
     c = Context({})
     return HttpResponse(t.render(c))
 
+def tags(request):
+    t = loader.get_template('tags.html')
+    c = Context({})
+    return HttpResponse(t.render(c))

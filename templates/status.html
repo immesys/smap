@@ -29,8 +29,8 @@
       </div> 
 
       <div class="right">
-        <div id="statchart"></div>
-        <div id="metadata" style="overflow: auto;"></div>
+        <div id="statchart" style="margin-bottom:10px;"></div>
+        <pre id="metadata" style="overflow: auto;"></pre>
       </div>
     </div>
 
@@ -126,13 +126,12 @@
           type: "post",
           data: query,
           success: function(res){
-            var m = JSON.stringify(res);
-            m = m.replace(/\,/g,'<br>');
+            var m = res[0]
             $('#metadata').empty();
-            $('#metadata').html(m);
-            r = res[0];
-            d3.select(".unit-text")
-              .text(r.Properties.UnitofMeasure);
+            if (!$.isEmptyObject(m)) {
+              m = JSON.stringify(m, null, 4);
+              $('#metadata').html(m);
+            }
           }
         });
       }
