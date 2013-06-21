@@ -35,7 +35,9 @@ urlpatterns = patterns('',
 
     (r'^$', 'powerdb2.views.root'),
      
-    (r'^tags/', 'powerdb2.status.views.tags')
+    (r'^status/', include('powerdb2.status.urls')),
+    
+    (r'^dashboard/', 'powerdb2.status.views.dashboard')
 )
 
 urlpatterns += staticfiles_urlpatterns()
