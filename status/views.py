@@ -21,3 +21,8 @@ def dashboard(request):
     t = loader.get_template('dashboard.html')
     c = Context({'user' : request.user})
     return HttpResponse(t.render(c))
+
+def smap_query(request):
+    t = loader.get_template('smap_query.html')
+    c = Context({'user' : request.user})
+    return HttpResponse(t.render(c))
