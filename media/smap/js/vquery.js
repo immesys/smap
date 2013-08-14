@@ -142,7 +142,6 @@ function VQuery(url, callback){
     });
   });
     
-  $('#vq-constraint-val-0').focus();
   this.initConstraint(0);
   $.ajax({
     url: url,
@@ -153,4 +152,5 @@ function VQuery(url, callback){
       auto.data('typeahead').source = res
     }
   });
+  $('#vq-constraint-val-0').focus();
 }
