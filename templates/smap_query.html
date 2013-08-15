@@ -148,6 +148,7 @@
       }
 
       function handleFailure(res){
+        console.log(res)
         $("#output-raw-pre").html("Query invalid or timed out")
         $('.loading').hide()
       }
@@ -156,7 +157,9 @@
         var json = []
         for (var j in data){
           var el = data[j];
-          json.push({"timestamp": el[0], "reading": el[1]});
+          if (el[1] != null) {
+            json.push({"timestamp": el[0], "reading": el[1]});
+          }
         }
         return json;
       }
