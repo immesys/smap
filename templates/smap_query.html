@@ -148,8 +148,7 @@
       }
 
       function handleFailure(res, textStatus, errorThrown){
-        console.log([textStatus, errorThrown])
-        if (res.status==200){
+        if (res.status==200){ 
           try {
             var chunks = res.responseText.split("\n")
             chunks.pop()
@@ -165,7 +164,7 @@
                   json.push(o)
                 } else {
                   var r = o.Readings
-                  json[i].Readings.concat(o.Readings)
+                  json[i].Readings = json[i].Readings.concat(r)
                 }
               });
             });
@@ -176,6 +175,7 @@
             $("#output-raw-pre").html("JSON error")
           }
         } else { 
+          console.log([textStatus, errorThrown])
           $("#output-raw-pre").html("Query invalid or timed out")
         }
         $('.loading').hide()
