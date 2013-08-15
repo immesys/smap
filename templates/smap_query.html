@@ -147,9 +147,37 @@
         $('.loading').hide()
       }
 
-      function handleFailure(res){
-        console.log(res)
-        $("#output-raw-pre").html("Query invalid or timed out")
+      function handleFailure(res, textStatus, errorThrown){
+        console.log([textStatus, errorThrown])
+        if (res.status==200){
+          try {
+            var chunks = res.responseText.split("\n")
+            chunks.pop()
+            var json = []
+            var memo_uuids = []
+            _.each(chunks, function(chunk){
+              var chunk_json = JSON.parse(chunk)
+              _.each(chunk_json, function(o){
+                var uuid = o.uuid
+                var i = memo_uuids.indexOf(uuid)
+                if (i==-1){
+                  memo_uuids.push(uuid)
+                  json.push(o)
+                } else {
+                  var r = o.Readings
+                  json[i].Readings.concat(o.Readings)
+                }
+              });
+            });
+            handleResult(json)
+          }
+          catch(err) {
+            console.log(err)
+            $("#output-raw-pre").html("JSON error")
+          }
+        } else { 
+          $("#output-raw-pre").html("Query invalid or timed out")
+        }
         $('.loading').hide()
       }
 
@@ -228,7 +256,8 @@
           url: url,
           type: "post",
           data: query,
-          timeout: 60000,
+          timeout: 120000,
+          dataType: 'text json',
           success: success_callback,
           error: fail_callback
         });
