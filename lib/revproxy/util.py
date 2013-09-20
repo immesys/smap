@@ -6,7 +6,10 @@
 import sys
 
 from urlparse import urljoin, urlparse, urlunparse
-from django.http import absolute_http_url_re
+try:
+    from django.http.request import absolute_http_url_re  # Django 1.5+
+except ImportError:
+    from django.http import absolute_http_url_re
 
 def absolute_uri(request, base_url):
     if not absolute_http_url_re.match(base_url):
